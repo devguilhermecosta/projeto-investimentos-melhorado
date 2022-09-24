@@ -1,16 +1,16 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import Tk, ttk
+from ttkthemes import ThemedTk
 
+master = ThemedTk(theme='blue')
 
-master = Tk()
+s = ttk.Style('TButton',
+             )
 
-dados = StringVar()
+button = ttk.Button(master,
+                    text='Teste',
+                    borderwidth=0,
+                    )
+button.pack()
 
-dados.set('Meus Dados')
-
-entry = ttk.Entry(master,
-                  textvariable=dados,
-                  state='readonly',
-                  ).grid()
 
 master.mainloop()
