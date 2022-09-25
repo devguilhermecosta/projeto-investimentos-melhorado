@@ -145,6 +145,11 @@ class MetodosSqlRV:
         acao = "UPDATE RV SET PU=? WHERE id=?"
         self._cursor.execute(acao, (pu, ident))
         self._conn.commit()
+    
+    def acao_sql_retorna_tot_invst(self):
+        acao = "SELECT * FROM RV"
+        self._cursor.execute(acao)
+        tot = 0
 
     def __sub_acao_sql_select_all_com_id(self, ativo: Acao | Fiis) -> None:
         ident: int = self._get_id_rv(ativo.codigo)

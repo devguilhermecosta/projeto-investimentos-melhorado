@@ -104,6 +104,12 @@ class TestBancoDadosRv(unittest.TestCase):
     def test_bd_func_acertar_preco_unitario_deve_retornar_0_se_acertado(self):
         ativo = Acao('BTG Pactual', 'BTLG11')
         self.assertEqual(self.rep.acertar_preco_unit(ativo, 93.20), 0)
+
+    def test_bd_func_relatorio_acoes_deve_retornar_int_float(self):
+        self.assertIsInstance(self.rep.relatorio_acoes(), int | float)
+
+    def test_bd_func_relatorio_fiis_deve_retornar_int_ou_float(self):
+        self.assertIsInstance(self.rep.relatorio_fiis(), int | float)
         
     @staticmethod
     def gerar_ativo() -> tuple:

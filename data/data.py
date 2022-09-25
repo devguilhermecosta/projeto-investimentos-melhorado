@@ -13,8 +13,7 @@ try:
 except Exception as error:
     print(f'{error}')
     
-    
-from os import renames
+
 import sqlite3 as sq
 from .exceptions import AtivoJaCadastradoError, AtivoNaoCadastradoError, SaldoInsuficienteError
 from .exceptions import QuantidadeInsuficienteError
@@ -135,6 +134,27 @@ class RepositorioRendaVariavel(MetodosSqlRV):
             self.acao_sql_acertar_preco_unit(ativo, pu)            
             return 0
     
+    def relatorio_acoes(self):
+        acao: str = "SELECT * FROM RV"
+        self._cursor.execute(acao)
+        tot: int | float = 0
+
+        for item in self._cursor.fetchall():
+            if item[3] == 'Ações':
+                tot += float(item[7])
+
+        return tot
+    
+    def relatorio_fiis(self):
+        acao: str = "SELECT * FROM RV"
+        self._cursor.execute(acao)
+        tot: int | float = 0
+
+        for item in self._cursor.fetchall():
+            if item[3] == 'FIIs':
+                tot += float(item[7])
+
+        return tot
 
 class RepositorioRendaFixa(MetodosSqlRF):      
     def cadastrar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
@@ -246,3 +266,36 @@ class RepositorioRendaFixa(MetodosSqlRF):
         else:
             self.acao_sql_deletar_ativo(ativo)
             return 0
+    
+    def relatorio_res_emerg(self) -> int | float:
+        acao: str = "SELECT * FROM RF"
+        self._cursor.execute(acao)
+        tot: int | float = 0
+
+        for item in self._cursor.fetchall():
+            if item[3] == 'Reserva de Emergência':
+                tot += float(item[5])
+
+        return tot
+    
+    def relatorio_tesouro_direto(self) -> int | float:
+        acao: str = "SELECT * FROM RF"
+        self._cursor.execute(acao)
+        tot: int | float = 0
+
+        for item in self._cursor.fetchall():
+            if item[3] == 'Tesouro Direto':
+                tot += float(item[5])
+        
+        return tot
+
+    def relatorio_renda_fixa(self) -> int | float:
+        acao: str = "SELECT * FROM RF"
+        self._cursor.execute(acao)
+        tot: int | float = 0
+
+        for item in self._cursor.fetchall():
+            if item[3] == 'Renda Fixa':
+                tot += float(item[5])
+        
+        return tot

@@ -108,6 +108,15 @@ class TestBancoDadosRF(unittest.TestCase):
     def test_bd_func_deletar_ativo_deve_retornar_zero_se_ativo_deletado_com_sucesso(self):
         ativo: RendaFixa = self.ativo_qualquer_para_ser_deletado()
         self.assertEqual(self.rep.deletar_ativo(ativo), 0)
+    
+    def test_bd_func_relatorio_reserva_emergencia_deve_retornar_int_ou_float(self):
+        self.assertIsInstance(self.rep.relatorio_res_emerg(), int | float)
+    
+    def test_bd_func_relatorio_tesouro_diretori_deve_retornar_int_ou_float(self):
+        self.assertIsInstance(self.rep.relatorio_tesouro_direto(), int | float)
+
+    def test_bd_func_relatorio_renda_fixa_deve_retornar_int_ou_float(self):
+        self.assertIsInstance(self.rep.relatorio_renda_fixa(), int | float)
         
             
     @staticmethod            
