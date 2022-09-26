@@ -1,17 +1,18 @@
 from tkinter import ttk, Toplevel
 from ttkthemes import ThemedTk
 from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
+from time import sleep
 
 
 class PyInvest:
-
     def __init__(self):
         
         # MASTER
         self.master = ThemedTk(theme='black')
         self.master.title('PyInvets')
         self.master.configure(background='#000000')
-        self.set_size_window(self.master, 1016, 490)
+        self.general_functions = GeneralFunctions()
+        self.general_functions.set_size_window(self.master, 1016, 490)
         self.master.iconbitmap(default='images/logo.ico')
 
         # BUTTONS OF MENU
@@ -22,15 +23,9 @@ class PyInvest:
 
         # INFINITE LOOP
         self.master.mainloop()
-    
-    # FUNCTIONS
-    def set_size_window(self, window, width, height):
-        w = int((window.winfo_screenwidth() / 2) - (width/2))
-        h = int((window.winfo_screenheight() / 2) - (height/2))
-        window.geometry(f'{width}x{height}+{w}+{h}')
+
 
 class ButtonMenu(ttk.Frame):
-    
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
 
@@ -92,8 +87,8 @@ class ButtonMenu(ttk.Frame):
                                         )
         self.button_delete.grid(row=5, column=0, padx=10, pady=10)
 
-class FrameReport(ttk.Frame):
 
+class FrameReport(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
     
@@ -186,31 +181,69 @@ class FrameReport(ttk.Frame):
 
         return f'{tot:.2f}'
 
-class TopLevelRegister:
 
+class TopLevelRegister:
     def __init__(self, master):
         self.top_level = Toplevel(master)
         self.top_level.title('Cadastrar novo ativo')
         self.top_level.iconbitmap(default='images/logo.ico')
         self.top_level.configure(background='#000000')
-        self.set_size_window(self.top_level, 400, 400)
+        self.general_functions = GeneralFunctions()
+        self.general_functions.set_size_window(self.top_level, 400, 400)
 
         self.button_fixed_income = ttk.Button(self.top_level,
                                               text='Renda Fixa',
-                                              command=None)
+                                              command=lambda: self.open_toplevel_fixed_income(master),
+                                              )
         self.button_fixed_income.place(x=14, y=120)
 
         self.button_variable_income = ttk.Button(self.top_level,
                                                  text='Renda Variável',
-                                                 command=None,
+                                                 command=lambda: self.open_toplevel_variable_income(master),
                                                  )
         self.button_variable_income.place(x=14, y=190)
-
+    
     # FUNCTIONS
-    def set_size_window(self, window, width, height):
+    def open_toplevel_fixed_income(self, master):
+        self.top_level.destroy()
+        sleep(1)
+        top_level_fixed_income = TopLevelRegisterIncome(master,
+                                                        'Cadastro Renda Fixa',
+                                                        "images/logo.ico",
+                                                        '#000000',
+                                                        600,
+                                                        400,)
+    
+    def open_toplevel_variable_income(self, master):
+        self.top_level.destroy()
+        sleep(1)
+        top_level_variable_income = TopLevelRegisterIncome(master,
+                                                            'Cadastro Renda Variável',
+                                                            "images/logo.ico",
+                                                            '#000000',
+                                                            600,
+                                                            400,
+                                                            )
+
+class TopLevelRegisterIncome:
+    def __init__(self, master, title, logo: tuple, color, width, height):
+        top_level = Toplevel(master)
+        top_level.title(title)
+        top_level.iconbitmap(default=logo)
+        top_level.configure(background=color)
+        general_functions = GeneralFunctions()
+        general_functions.set_size_window(top_level, width, height)
+
+
+class GeneralFunctions:
+    @staticmethod
+    def set_size_window(window, width, height):
         w = int((window.winfo_screenwidth() / 2) - (width/2))
         h = int((window.winfo_screenheight() / 2) - (height/2))
         window.geometry(f'{width}x{height}+{w}+{h}')
+    
 
+# ALTERAR A LOGO PARA SER UMA VARIÁVEL DE USO GLOBAL
+# SE PRECISAR ALTERAR, ALTERA APENAS UMA VEZ.
 
 PyInvest()
