@@ -1,3 +1,4 @@
+from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
 from modulos.ativos.acoes import Acao
 from modulos.ativos.fiis import Fiis
 from modulos.ativos.renda_fixa import RendaFixa
@@ -12,37 +13,41 @@ tento um baixo acoplamento intre a interface e o usuário.
 
 
 class AtivoFactory:
+    def __init__(self):
+        self.rep_rv = RepositorioRendaVariavel()
+        self.rep_rf = RepositorioRendaFixa()
+
+    def criar_acao(self, nome: str, codigo: str) -> Acao:
+        self.rep_rv.cadastrar_ativo(Acao(nome, codigo))
+
+    def criar_fii(self, nome: str, codigo: str) -> Fiis:
+        self.rep_rv.cadastrar_ativo(Fiis(nome, codigo))
     
-    @staticmethod
-    def criar_acao(nome: str, codigo: str) -> Acao:
-        return Acao(nome, codigo)
-    
-    @staticmethod
-    def criar_fii(nome: str, codigo: str) -> Fiis:
-        return Fiis(nome, codigo)
-    
-    @staticmethod
-    def criar_renda_fixa(nome: str,
+    def criar_renda_fixa(self,
+                         nome: str,
                          resgate: str,
                          vencimento: str,
                          rentabilidade: str) -> RendaFixa:
-        return RendaFixa(nome, resgate, vencimento, rentabilidade)
+        self.rep_rf.cadastrar_ativo(RendaFixa(nome, resgate, vencimento, rentabilidade))
     
-    @staticmethod
-    def criar_tesouro_direto(nome: str,
+    def criar_tesouro_direto(self,
+                             nome: str,
                              resgate: str,
                              vencimento: str,
                              rentabilidade: str,
                              periodicidade_pagamentos: str) -> TesouroDireto:
-        return TesouroDireto(nome,
-                             resgate,
-                             vencimento,
-                             rentabilidade,
-                             periodicidade_pagamentos)
-        
-    @staticmethod
-    def criar_reserva_emergencia(nome: str,
+        self.rep_rf.cadastrar_ativo(TesouroDireto(nome,
+                                                  resgate,
+                                                  vencimento,
+                                                  rentabilidade,
+                                                  periodicidade_pagamentos))
+
+    def criar_reserva_emergencia(self,
+                                 nome: str,
                                  resgate: str,
                                  vencimento: str,
                                  rentabilidade: str) -> ReservaEmergencia:
-        return ReservaEmergencia(nome, resgate, vencimento, rentabilidade)
+        self.rep_rf.cadastrar_ativo(ReservaEmergencia(nome,
+                                                      resgate,
+                                                      vencimento,
+                                                      rentabilidade))

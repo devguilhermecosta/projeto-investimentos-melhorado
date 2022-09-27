@@ -1,7 +1,11 @@
 from tkinter import ttk, Toplevel
+from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
+from ativo_factory import AtivoFactory
 from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
 from time import sleep
+from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
+from data.exceptions import AtivoJaCadastradoError
 
 
 class PyInvest:
@@ -148,7 +152,6 @@ class FrameReport(ttk.Frame):
     def report_fiis(self):
         rep = RepositorioRendaVariavel()
         tot = rep.relatorio_fiis()
-        print(tot)
         return f'{tot:.2f}'
 
     def report_emergency_reserv(self):
@@ -204,35 +207,173 @@ class TopLevelRegister:
         self.button_variable_income.place(x=14, y=190)
     
     # FUNCTIONS
+    def open_toplevel_variable_income(self, master):
+        self.top_level.destroy()
+        sleep(1)
+        top_level_variable_income = TLRegVariableIncome(master,
+                                                    'Cadastro Renda Variável',
+                                                    "images/logo.ico",
+                                                    '#000000',
+                                                    580,
+                                                    400,)
+    
     def open_toplevel_fixed_income(self, master):
         self.top_level.destroy()
         sleep(1)
-        top_level_fixed_income = TopLevelRegisterIncome(master,
+        top_level_fixed_income = TLRegFixedleIncome(master,
                                                         'Cadastro Renda Fixa',
                                                         "images/logo.ico",
                                                         '#000000',
                                                         600,
-                                                        400,)
-    
-    def open_toplevel_variable_income(self, master):
-        self.top_level.destroy()
-        sleep(1)
-        top_level_variable_income = TopLevelRegisterIncome(master,
-                                                            'Cadastro Renda Variável',
-                                                            "images/logo.ico",
-                                                            '#000000',
-                                                            600,
-                                                            400,
-                                                            )
+                                                        400,
+                                                        )
 
-class TopLevelRegisterIncome:
+class TLRegVariableIncome:
     def __init__(self, master, title, logo: tuple, color, width, height):
-        top_level = Toplevel(master)
-        top_level.title(title)
-        top_level.iconbitmap(default=logo)
-        top_level.configure(background=color)
+        self.top_level = Toplevel(master)
+        self.top_level.title(title)
+        self.top_level.iconbitmap(default=logo)
+        self.top_level.configure(background=color)
         general_functions = GeneralFunctions()
-        general_functions.set_size_window(top_level, width, height)
+        general_functions.set_size_window(self.top_level, width, height)
+
+        # VARIABLES
+        self.repository = AtivoFactory()
+        self.check_action = False
+        self.check_fii = False
+
+        # STYLES
+        s = ttk.Style()
+        s.configure('RV.TRadiobutton',
+                    background='#000000',
+                    foreground='white',
+                    font='arial 20',
+                    )
+                    
+        s.configure('RV.TFrame',
+                    background='#000000',
+                    )
+        
+        s.configure('RV.TLabel',
+                    background='#000000',
+                    foreground='white',
+                    font='arila 20',
+                    padding=10,
+                    )
+
+        # NAME
+        label_name = ttk.Label(self.top_level,
+                        text='Nome:',
+                        style='RV.TLabel'
+                        )
+        label_name.grid(row=0, column=0)
+
+        self.entry_name = ttk.Entry(self.top_level,
+                                width=30,
+                                font='arial, 20',
+                                )
+        self.entry_name.grid(row=0, column=1)
+
+        # CODE
+        label_code = ttk.Label(self.top_level,
+                                text='Código',
+                                style='RV.TLabel'
+                                )
+        label_code.grid(row=1, column=0)
+
+        self.entry_code = ttk.Entry(self.top_level,
+                                width=30,
+                                font='arial 20',
+                                )
+        self.entry_code.grid(row=1, column=1)
+
+        # OPTIONS
+        frame = ttk.Frame(self.top_level, style='RV.TFrame')
+        frame.grid(row=2, column=0, columnspan=2)
+
+        action = ttk.Radiobutton(frame,
+                                text='Ações',
+                                value=0,
+                                style='RV.TRadiobutton',
+                                padding=10,
+                                command=self.validate_action,
+                                )
+        action.grid(row=0, column=0)
+
+        fii = ttk.Radiobutton(frame,
+                              text='FIIs',
+                              value=1,
+                              style='RV.TRadiobutton',
+                              padding=10,
+                              command=self.validate_fii,
+                              )
+        fii.grid(row=1, column=0)
+
+        # BUTTONS
+        frame_options = ttk.Frame(self.top_level, style='RV.TFrame')
+        frame_options.grid(row=3, column=0, columnspan=2)
+        button_register = ttk.Button(frame_options,
+                                    text='CADASTRAR',
+                                    command=self.register,
+                                    )
+        button_register.grid(row=0, column=0, pady=10)
+
+        button_cancel = ttk.Button(frame_options,
+                                   text='CANCELAR',
+                                   command=self.quit,
+                                   )
+        button_cancel.grid(row=1, column=0, pady=10)
+    
+    def validate_action(self):
+        self.check_action = True
+        self.check_fii = False
+
+    def validate_fii(self):
+        self.check_action = False
+        self.check_fii = True
+
+    def register(self):
+        if self.check_action:
+            try:
+                name = self.entry_name.get().title()
+                code = self.entry_code.get().upper()
+
+                if len(name) == 0 or len(code) == 0:
+                    showerror(message='Preencha todos os dados')
+                elif len(code) < 5:
+                    showerror(message='O código precisa ter pelo menos 5 caracteres')
+                else:
+                    self.repository.criar_acao(name, code)
+                    showinfo(message='Ativo cadastrado com sucesso.')
+            except AtivoJaCadastradoError:
+                showerror(message='Ativo já cadastrado no banco de dados')
+            
+        if self.check_fii:
+            try:
+                name = self.entry_name.get().title()
+                code = self.entry_code.get().upper()
+
+                if len(name) == 0 or len(code) == 0:
+                    showerror(message='Preencha todos os dados')
+                elif len(code) < 5:
+                    showerror(message='O código precisa ter pelo menos 5 caracteres')
+                else:
+                    self.repository.criar_fii(name, code)
+                    showinfo(message='Ativo cadastrado com sucesso.')
+            except AtivoJaCadastradoError:
+                showerror(message='Ativo já cadastrado no banco de dados')
+        
+    def quit(self):
+        self.top_level.destroy()
+
+class TLRegFixedleIncome:
+    def __init__(self, master, title, logo: tuple, color, width, height):
+        self.top_level = Toplevel(master)
+        self.top_level.title(title)
+        self.top_level.iconbitmap(default=logo)
+        self.top_level.configure(background=color)
+        general_functions = GeneralFunctions()
+        general_functions.set_size_window(self.top_level, width, height)
 
 
 class GeneralFunctions:
