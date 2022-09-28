@@ -1,3 +1,5 @@
+from distutils.cmd import Command
+from email.policy import default
 from tkinter import ttk, Toplevel
 from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
@@ -13,7 +15,7 @@ class PyInvest:
         
         # MASTER
         self.master = ThemedTk(theme='black')
-        self.master.title('PyInvets')
+        self.master.title('PyInvest')
         self.master.configure(background='#000000')
         self.general_functions = GeneralFunctions()
         self.general_functions.set_size_window(self.master, 1016, 490)
@@ -374,6 +376,142 @@ class TLRegFixedleIncome:
         self.top_level.configure(background=color)
         general_functions = GeneralFunctions()
         general_functions.set_size_window(self.top_level, width, height)
+
+        # STYLES
+        s = ttk.Style()
+        s.configure('RF.TRadiobutton',
+                    background='#000000',
+                    foreground='white',
+                    font='arial 20',
+                    )
+                    
+        s.configure('RF.TFrame',
+                    background='#000000',
+                    )
+        
+        s.configure('RF.TLabel',
+                    background='#000000',
+                    foreground='white',
+                    font='arila 20',
+                    padding=10,
+                    )
+
+        # NAME
+        label_name = ttk.Label(self.top_level,
+                                text='Nome:',
+                                style='RF.TLabel'
+                                )
+        label_name.grid(row=1, column=0)
+
+        self.entry_name = ttk.Entry(self.top_level,
+                                    width=20,
+                                    font='arial 20',
+                                    state='disabled',
+                                    )
+        self.entry_name.grid(row=1, column=1)
+
+        # MONEY REDEMPTION
+        label_redemption = ttk.Label(self.top_level,
+                                          text='Resgate:',
+                                          style='RF.TLabel',
+                                          )
+        label_redemption.grid(row=2, column=0)
+
+        self.entry_redemption = ttk.Entry(self.top_level,
+                                          width=15,
+                                          font='arial 20',
+                                          state='disabled',
+                                          )
+        self.entry_redemption.grid(row=2, column=1)
+
+        # EXPIRATION
+        label_expiration = ttk.Label(self.top_level,
+                                    text='Vencimento:',
+                                    style='RF.TLabel',
+                                    )
+        label_expiration.grid(row=3, column=0)
+
+        self.entry_expiration = ttk.Entry(self.top_level,
+                                          width=15,
+                                          font='arial 20',
+                                          state='disabled',
+                                          )
+        self.entry_expiration.grid(row=3, column=1)
+
+        # PROFITABILITY
+        label_profitability = ttk.Label(self.top_level,
+                                       text='Rentabilidade:',
+                                       style='RF.TLabel',
+                                       )
+        label_profitability.grid(row=4, column=0)
+
+        self.entry_profitability = ttk.Entry(self.top_level,
+                                          width=15,
+                                          font='arial 20',
+                                          state='disabled',
+                                          )
+        self.entry_profitability.grid(row=4, column=1)
+
+        # PAYMENT
+        label_payment = ttk.Label(self.top_level,
+                                  text='Período dos pagamentos: ',
+                                  style='RF.TLabel',
+                                  )
+        label_payment.grid(row=5, column=0, columnspan=2, padx=(100, 0))
+
+        self.entry_payment = ttk.Entry(self.top_level,
+                                      width=15,
+                                      font='arial 20',
+                                      state='disabled',
+                                      )
+        self.entry_payment.grid(row=6, column=0, columnspan=2, padx=(100, 0))
+
+        # OPTIONS
+        self.options = ttk.Combobox(self.top_level,
+                                    values=('Renda Fixa',
+                                            'Tesouro Direto',
+                                            'Reserva de Emergência'),
+                                    font='arial 20',
+                                    )
+        self.options.grid(row=0, column=0)
+
+        self.button_validate = ttk.Button(self.top_level,
+                                          text='V',
+                                          command=self.select_option,
+                                          )
+        self.button_validate.grid(row=0, column=1)
+    
+    def select_option(self): 
+        if self.options.get() == 'Renda Fixa':
+            self.entry_name['state'] = 'normal'
+            self.entry_redemption['state'] = 'normal'
+            self.entry_expiration['state'] = 'normal'
+            self.entry_profitability['state'] = 'normal'
+            self.entry_payment['state'] = 'disabled'
+            print(self.entry_name.state)
+        
+        elif self.options.get() == 'Reserva de Emergência':
+            self.entry_name['state'] = 'normal'
+            self.entry_redemption['state'] = 'normal'
+            self.entry_expiration['state'] = 'normal'
+            self.entry_profitability['state'] = 'normal'
+            self.entry_payment['state'] = 'disabled'
+
+        elif self.options.get() == 'Tesouro Direto':
+            self.entry_name['state'] = 'normal'
+            self.entry_redemption['state'] = 'normal'
+            self.entry_expiration['state'] = 'normal'
+            self.entry_profitability['state'] = 'normal'
+            self.entry_payment['state'] = 'normal'
+
+        else: 
+            self.entry_name['state'] = 'disabled'
+            self.entry_redemption['state'] = 'disabled'
+            self.entry_expiration['state'] = 'disabled'
+            self.entry_profitability['state'] = 'disabled'
+            self.entry_payment['state'] = 'disabled'
+
+
 
 
 class GeneralFunctions:
