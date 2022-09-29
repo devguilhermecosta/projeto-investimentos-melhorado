@@ -361,6 +361,7 @@ class TLRegVariableIncome:
     def quit(self):
         self.top_level.destroy()
 
+
 class TLRegFixedleIncome:
     def __init__(self, master, title, color, width, height):
         self.top_level = Toplevel(master)
@@ -539,10 +540,11 @@ class TLRegFixedleIncome:
         list_one = [name, redemption, expiration, profitability]
         
         try:
-            if self.check_one(list_one) == False:
+            if not self.check_one(list_one):
                 showerror(message='Verifique os dados informados.')
+                return
             
-            if self.state == 'Renda Fixa':
+            elif self.state == 'Renda Fixa':
                 self.rep_rf.criar_renda_fixa(name,
                                             redemption,
                                             expiration,
@@ -577,17 +579,13 @@ class TLRegFixedleIncome:
             if len(l) == 0:
                 return False
 
-            
-        
+
 class GeneralFunctions:
     @staticmethod
     def set_size_window(window, width, height):
         w = int((window.winfo_screenwidth() / 2) - (width/2))
         h = int((window.winfo_screenheight() / 2) - (height/2))
         window.geometry(f'{width}x{height}+{w}+{h}')
-    
 
-# ALTERAR A LOGO PARA SER UMA VARIÁVEL DE USO GLOBAL
-# SE PRECISAR ALTERAR, ALTERA APENAS UMA VEZ.
 
 PyInvest()
