@@ -19,9 +19,17 @@ class PyInvest:
 
         # BUTTONS OF MENU
         self.frame_buttons = ButtonMenu(self.master)
+        self.frame_buttons.configure(relief='ridge',
+                                     borderwidth=2,
+                                     )
+        self.frame_buttons.grid(row=0, column=0, padx=10, pady=10, sticky=('n', 'e', 's', 'w'))
 
         # FRAME FOR REPORTS
-        self.frame_report = FrameReport(self.master)   
+        self.frame_report = FrameReport(self.master)
+        self.frame_report.configure(relief='ridge',
+                                    borderwidth=2,
+                                    )
+        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=('n', 'e', 's', 'w'))
 
         # INFINITE LOOP
         self.master.mainloop()
@@ -30,118 +38,103 @@ class PyInvest:
 class ButtonMenu(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
-        # FRAME FOR BUTTONS
-        self.frame_b = ttk.Frame(self.master,
-                                relief='ridge',
-                                borderwidth=2,
-                                )
-        self.frame_b.grid(row=0, column=0, padx=10, pady=10, sticky=('n', 'e', 's', 'w'))
-
-        # BUTTONS
-        self.s = ttk.Style()
-        self.s.configure('TButton',
-                        width=20,
-                        padding=10,
-                        anchor='center',
-                        font='arial 20',
+        
+        s = ttk.Style()
+        s.configure('TButton',
+                    width=20,
+                    padding=10,
+                    anchor='center',
+                    font='arial 20',
                         )
-        self.s.map('TButton',
-                    background=[('disabled', '#ccc'),
-                                ('!active', '#009E2D'),
-                                ('pressed', '#9BF0B7'), 
-                                ('active', '#10EB4E'),
-                                ],
-                    foreground=[('pressed', '#575757')]
+        s.map('TButton',
+                background=[('disabled', '#ccc'),
+                            ('!active', '#009E2D'),
+                            ('pressed', '#9BF0B7'), 
+                            ('active', '#10EB4E'),
+                            ],
+                foreground=[('pressed', '#575757')]
+                    )
+
+        button_register = ttk.Button(self,
+                                    text='CADASTRAR',
+                                    command=lambda :TopLevelRegister(self.master),
+                                    )
+        button_register.grid(row=0, column=0, padx=10, pady=10)
+
+        button_purchase = ttk.Button(self,
+                                    text='COMPRAR',
+                                    command=None)
+        button_purchase.grid(row=1, column=0, padx=10, pady=10)
+
+        button_sell = ttk.Button(self,
+                                text='VENDER',
+                                command=None,
                                 )
+        button_sell.grid(row=2, column=0, padx=10, pady=10)
 
-        self.button_register = ttk.Button(self.frame_b,
-                                         text='CADASTRAR',
-                                         command= lambda :TopLevelRegister(self.master),
-                                         )
-        self.button_register.grid(row=0, column=0, padx=10, pady=10)
+        button_m_value = ttk.Button(self,
+                                    text='ACERTAR VALOR',
+                                    command=None,
+                                    )
+        button_m_value.grid(row=3, column=0, padx=10, pady=10)
 
-        self.button_purchase = ttk.Button(self.frame_b,
-                                         text='COMPRAR',
-                                         command=None)
-        self.button_purchase.grid(row=1, column=0, padx=10, pady=10)
+        button_m_amount = ttk.Button(self,
+                                    text='ACERTAR QUANTIDADE',
+                                    command=None,
+                                    )
+        button_m_amount.grid(row=4, column=0, padx=10, pady=10)
 
-        self.button_sell = ttk.Button(self.frame_b,
-                                     text='VENDER',
-                                     command=None,
-                                     )
-        self.button_sell.grid(row=2, column=0, padx=10, pady=10)
-
-        self.button_m_value = ttk.Button(self.frame_b,
-                                        text='ACERTAR VALOR',
-                                        command=None,
-                                        )
-        self.button_m_value.grid(row=3, column=0, padx=10, pady=10)
-
-        self.button_m_amount = ttk.Button(self.frame_b,
-                                         text='ACERTAR QUANTIDADE',
-                                         command=None,
-                                         )
-        self.button_m_amount.grid(row=4, column=0, padx=10, pady=10)
-
-        self.button_delete = ttk.Button(self.frame_b,
-                                        text='EXCLUIR',
-                                        command=None,
-                                        )
-        self.button_delete.grid(row=5, column=0, padx=10, pady=10)
+        button_delete = ttk.Button(self,
+                                    text='EXCLUIR',
+                                    command=None,
+                                    )
+        button_delete.grid(row=5, column=0, padx=10, pady=10)
 
 
 class FrameReport(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-    
-        # FRAME FOR REPORT
-        self.frame_report = ttk.Frame(self.master,
-                                     relief='ridge',
-                                     borderwidth=2,
-                                     )
-        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=('n', 'e', 's', 'w'))
 
         # LABELS FOR REPORTS
-        self.s = ttk.Style()
-        self.s.configure('L.TLabel', font='arial, 20', foreground='white')
+        s = ttk.Style()
+        s.configure('L.TLabel', font='arial, 20', foreground='white')
 
-        self.label_actions = ttk.Label(self.frame_report,
-                                       text=f'Total investido em Ações: R$ {self.report_actions()}',
+        label_actions = ttk.Label(self,
+                                  text=f'Total investido em Ações: R$ {self.report_actions()}',
+                                  style='L.TLabel',
+                                  )
+        label_actions.grid(row=0, column=0, padx=5, pady=5)
+
+        label_fii = ttk.Label(self,
+                              text=f'Total investido em FIIs: R$ {self.report_fiis()}',
+                              style='L.TLabel',
+                              )
+        label_fii.grid(row=1, column=0, padx=5, pady=5)
+
+        label_direct_treasure = ttk.Label(self,
+                                          text=f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}',
+                                          style='L.TLabel',
+                                          )
+        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5)
+
+        label_fixed_income = ttk.Label(self,
+                                       text=f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}',
                                        style='L.TLabel',
                                        )
-        self.label_actions.grid(row=0, column=0, padx=5, pady=5)
+        label_fixed_income.grid(row=3, column=0, padx=5, pady=5)
 
-        self.label_fii = ttk.Label(self.frame_report,
-                                   text=f'Total investido em FIIs: R$ {self.report_fiis()}',
-                                   style='L.TLabel',
-                                   )
-        self.label_fii.grid(row=1, column=0, padx=5, pady=5)
-
-        self.label_direct_treasure = ttk.Label(self.frame_report,
-                                              text=f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}',
-                                              style='L.TLabel',
-                                              )
-        self.label_direct_treasure.grid(row=2, column=0, padx=5, pady=5)
-
-        self.label_fixed_income = ttk.Label(self.frame_report,
-                                            text=f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}',
+        label_emergency_reserve = ttk.Label(self,
+                                            text=f'Total na Reserva de Emergência: R${self.report_emergency_reserv()}',
                                             style='L.TLabel',
                                             )
-        self.label_fixed_income.grid(row=3, column=0, padx=5, pady=5)
+        label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5)
 
-        self.label_emergency_reserve = ttk.Label(self.frame_report,
-                                                text=f'Total na Reserva de Emergência: R$ {self.report_emergency_reserv()}',
-                                                style='L.TLabel',
-                                                )
-        self.label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5)
-
-        self.label_total_invest = ttk.Label(self.frame_report,
-                                            text=f'Total investido: R$ {self.report_total_invested()}',
-                                            font='arial 24 bold',
-                                            foreground='#009E2D',
-                                            )
-        self.label_total_invest.grid(row=5, column=0)
+        label_total_invest = ttk.Label(self,
+                                       text=f'Total investido: R$ {self.report_total_invested()}',
+                                       font='arial 24 bold',
+                                       foreground='#009E2D',
+                                       )
+        label_total_invest.grid(row=5, column=0)
     
     def report_actions(self):
         rep = RepositorioRendaVariavel()
@@ -189,40 +182,40 @@ class TopLevelRegister:
         self.top_level = Toplevel(master)
         self.top_level.title('Cadastrar novo ativo')
         self.top_level.configure(background='#000000')
-        self.general_functions = GeneralFunctions()
-        self.general_functions.set_size_window(self.top_level, 400, 400)
+        general_functions = GeneralFunctions()
+        general_functions.set_size_window(self.top_level, 400, 400)
 
-        self.button_fixed_income = ttk.Button(self.top_level,
-                                              text='Renda Fixa',
-                                              command=lambda: self.open_toplevel_fixed_income(master),
-                                              )
-        self.button_fixed_income.place(x=40, y=120)
+        button_fixed_income = ttk.Button(self.top_level,
+                                         text='Renda Fixa',
+                                         command=lambda: self.open_toplevel_fixed_income(master),
+                                         )
+        button_fixed_income.place(x=40, y=120)
 
-        self.button_variable_income = ttk.Button(self.top_level,
-                                                 text='Renda Variável',
-                                                 command=lambda: self.open_toplevel_variable_income(master),
-                                                 )
-        self.button_variable_income.place(x=40, y=190)
+        button_variable_income = ttk.Button(self.top_level,
+                                            text='Renda Variável',
+                                            command=lambda: self.open_toplevel_variable_income(master),
+                                            )
+        button_variable_income.place(x=40, y=190)
     
     # FUNCTIONS
     def open_toplevel_variable_income(self, master):
         self.top_level.destroy()
         sleep(1)
-        top_level_variable_income = TLRegVariableIncome(master,
-                                                        'Cadastro Renda Variável',
-                                                        '#000000',
-                                                        580,
-                                                        400,)
+        TLRegVariableIncome(master,
+                            'Cadastro Renda Variável',
+                            '#000000',
+                            580,
+                            400,)
     
     def open_toplevel_fixed_income(self, master):
         self.top_level.destroy()
         sleep(1)
-        top_level_fixed_income = TLRegFixedleIncome(master,
-                                                    'Cadastro Renda Fixa',
-                                                    '#000000',
-                                                    535,
-                                                    500,
-                                                    )
+        TLRegFixedleIncome(master,
+                           'Cadastro Renda Fixa',
+                           '#000000',
+                           535,
+                           500,
+                           )
 
 class TLRegVariableIncome:
     def __init__(self, master, title, color, width, height):
@@ -329,17 +322,29 @@ class TLRegVariableIncome:
 
     def register(self):
         if self.check_action:
+            
+            def check_data(data: tuple, step: int):
+                for i in data:
+                    if len(i) < step:
+                        return False
+                    else:
+                        return True
             try:
                 name = self.entry_name.get().title()
                 code = self.entry_code.get().upper()
 
-                if len(name) == 0 or len(code) == 0:
+                if not check_data((name, code), 1):
                     showerror(message='Preencha todos os dados')
-                elif len(code) < 5:
+                    
+                elif not check_data((code,), 5):
                     showerror(message='O código precisa ter pelo menos 5 caracteres')
+                    
                 else:
                     self.repository.criar_acao(name, code)
                     showinfo(message='Ativo cadastrado com sucesso.')
+                    self.entry_name.delete(0, 'end')
+                    self.entry_code.delete(0, 'end')
+                    
             except AtivoJaCadastradoError:
                 showerror(message='Ativo já cadastrado no banco de dados')
             
@@ -350,13 +355,21 @@ class TLRegVariableIncome:
 
                 if len(name) == 0 or len(code) == 0:
                     showerror(message='Preencha todos os dados')
+                    
                 elif len(code) < 5:
                     showerror(message='O código precisa ter pelo menos 5 caracteres')
+                    
                 else:
                     self.repository.criar_fii(name, code)
                     showinfo(message='Ativo cadastrado com sucesso.')
+                    self.entry_name.delete(0, 'end')
+                    self.entry_code.delete(0, 'end')
+                    
             except AtivoJaCadastradoError:
                 showerror(message='Ativo já cadastrado no banco de dados')
+                
+        if not self.check_action and not self.check_fii:
+            showerror(message='Preencha todos os dados')
         
     def quit(self):
         self.top_level.destroy()
@@ -550,6 +563,10 @@ class TLRegFixedleIncome:
                                             expiration,
                                             profitability,
                                             )
+                self.entry_name.delete(0, 'end')
+                self.entry_redemption.delete(0, 'end')
+                self.entry_expiration.delete(0, 'end')
+                self.entry_profitability.delete(0, 'end')
                 showinfo(message='Ativo cadastrado com sucesso')
             
             elif self.state == 'Reserva de Emergência':
@@ -560,24 +577,34 @@ class TLRegFixedleIncome:
                                                     )
                 showinfo(message='Ativo cadastrado com sucesso')
             
-            elif self.state == 'Tesouro Direto':
+            elif self.state == 'Tesouro Direto':            
                 payment = self.entry_payment.get().upper()
                 
-                self.rep_rf.criar_tesouro_direto(name,
-                                                redemption,
-                                                expiration,
-                                                profitability,
-                                                payment,
-                                                )
-                showinfo(message='Ativo cadastrado com sucesso')
+                list_one.append(payment)
+                
+                if not self.check_one(list_one):
+                    showerror(message='Verifique os dados informados.')
+                    return
+
+                else:
+                    self.rep_rf.criar_tesouro_direto(name,
+                                                    redemption,
+                                                    expiration,
+                                                    profitability,
+                                                    payment,
+                                                    )
+                    showinfo(message='Ativo cadastrado com sucesso')
                 
         except AtivoJaCadastradoError:
             showerror(message='Ativo já cadastrado na base de dados.')
 
-    def check_one(self, list_of_data):
-        for l in list_of_data:
-            if len(l) == 0:
+    @staticmethod
+    def check_one(tuple_of_data):
+        for l in tuple_of_data:
+            if len(l) <= 0:
                 return False
+            else:
+                return True
 
 
 class GeneralFunctions:
