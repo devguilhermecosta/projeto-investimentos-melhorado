@@ -28,3 +28,11 @@ class SaldoInsuficienteError(BaseException):
         
     def __str__(self) -> str:
         return self.msg
+    
+
+class FaltamDadosErros(BaseException):
+    def __init__(self, msg):
+        self.msg = msg
+        
+    def __str__(self):
+        return self.msg
