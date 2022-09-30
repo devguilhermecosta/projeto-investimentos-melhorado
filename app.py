@@ -57,14 +57,14 @@ class ButtonMenu(ttk.Frame):
 
         button_register = ttk.Button(self,
                                     text='CADASTRAR',
-                                    command=lambda :TopLevelRegister(self.master),
+                                    command=lambda: TopLevelRegister(self.master),
                                     )
         button_register.grid(row=0, column=0, padx=10, pady=10)
 
-        button_purchase = ttk.Button(self,
-                                    text='COMPRAR',
-                                    command=None)
-        button_purchase.grid(row=1, column=0, padx=10, pady=10)
+        button_list = ttk.Button(self,
+                                    text='ATIVOS',
+                                    command=lambda: ListProducts(self.master))
+        button_list.grid(row=1, column=0, padx=10, pady=10)
 
         button_sell = ttk.Button(self,
                                 text='VENDER',
@@ -217,13 +217,12 @@ class TopLevelRegister:
                            500,
                            )
 
-class TLRegVariableIncome:
+class TLRegVariableIncome(Toplevel):
     def __init__(self, master, title, color, width, height):
-        self.top_level = Toplevel(master)
-        self.top_level.title(title)
-        self.top_level.configure(background=color)
-        general_functions = GeneralFunctions()
-        general_functions.set_size_window(self.top_level, width, height)
+        Toplevel.__init__(self, master)
+        self.title(title)
+        self.configure(background=color)
+        GeneralFunctions().set_size_window(self, width, height)
 
         # VARIABLES
         self.repository = AtivoFactory()
@@ -250,42 +249,42 @@ class TLRegVariableIncome:
                     )
 
         # NAME
-        label_name = ttk.Label(self.top_level,
-                        text='Nome:',
-                        style='RV.TLabel'
-                        )
+        label_name = ttk.Label(self,
+                               text='Nome:',
+                               style='RV.TLabel'
+                               )
         label_name.grid(row=0, column=0)
 
-        self.entry_name = ttk.Entry(self.top_level,
-                                width=30,
-                                font='arial, 20',
-                                )
+        self.entry_name = ttk.Entry(self,
+                                    width=30,
+                                    font='arial, 20',
+                                    )
         self.entry_name.grid(row=0, column=1)
 
         # CODE
-        label_code = ttk.Label(self.top_level,
-                                text='Código',
-                                style='RV.TLabel'
-                                )
+        label_code = ttk.Label(self,
+                               text='Código',
+                               style='RV.TLabel'
+                               )
         label_code.grid(row=1, column=0)
 
-        self.entry_code = ttk.Entry(self.top_level,
-                                width=30,
-                                font='arial 20',
-                                )
+        self.entry_code = ttk.Entry(self,
+                                    width=30,
+                                    font='arial 20',
+                                    )
         self.entry_code.grid(row=1, column=1)
 
         # OPTIONS
-        frame = ttk.Frame(self.top_level, style='RV.TFrame')
+        frame = ttk.Frame(self, style='RV.TFrame')
         frame.grid(row=2, column=0, columnspan=2)
 
         action = ttk.Radiobutton(frame,
-                                text='Ações',
-                                value=0,
-                                style='RV.TRadiobutton',
-                                padding=10,
-                                command=self.validate_action,
-                                )
+                                 text='Ações',
+                                 value=0,
+                                 style='RV.TRadiobutton',
+                                 padding=10,
+                                 command=self.validate_action,
+                                 )
         action.grid(row=0, column=0)
 
         fii = ttk.Radiobutton(frame,
@@ -298,7 +297,7 @@ class TLRegVariableIncome:
         fii.grid(row=1, column=0)
 
         # BUTTONS
-        frame_options = ttk.Frame(self.top_level, style='RV.TFrame')
+        frame_options = ttk.Frame(self, style='RV.TFrame')
         frame_options.grid(row=3, column=0, columnspan=2)
         button_register = ttk.Button(frame_options,
                                     text='CADASTRAR',
@@ -372,16 +371,15 @@ class TLRegVariableIncome:
             showerror(message='Preencha todos os dados')
         
     def quit(self):
-        self.top_level.destroy()
+        self.destroy()
 
 
-class TLRegFixedleIncome:
+class TLRegFixedleIncome(Toplevel):
     def __init__(self, master, title, color, width, height):
-        self.top_level = Toplevel(master)
-        self.top_level.title(title)
-        self.top_level.configure(background=color)
-        general_functions = GeneralFunctions()
-        general_functions.set_size_window(self.top_level, width, height)
+        Toplevel.__init__(self, master)
+        self.title(title)
+        self.configure(background=color)
+        GeneralFunctions().set_size_window(self, width, height)
 
         # STYLES
         s = ttk.Style()
@@ -405,13 +403,13 @@ class TLRegFixedleIncome:
         s.configure('RFO.TButton', width=5, height=5, font='arial 5')
 
         # NAME
-        label_name = ttk.Label(self.top_level,
+        label_name = ttk.Label(self,
                                 text='Nome:',
                                 style='RF.TLabel'
                                 )
         label_name.grid(row=1, column=0)
 
-        self.entry_name = ttk.Entry(self.top_level,
+        self.entry_name = ttk.Entry(self,
                                     width=20,
                                     font='arial 20',
                                     state='disabled',
@@ -419,13 +417,13 @@ class TLRegFixedleIncome:
         self.entry_name.grid(row=1, column=1)
 
         # MONEY REDEMPTION
-        label_redemption = ttk.Label(self.top_level,
+        label_redemption = ttk.Label(self,
                                           text='Resgate:',
                                           style='RF.TLabel',
                                           )
         label_redemption.grid(row=2, column=0)
 
-        self.entry_redemption = ttk.Entry(self.top_level,
+        self.entry_redemption = ttk.Entry(self,
                                           width=15,
                                           font='arial 20',
                                           state='disabled',
@@ -433,13 +431,13 @@ class TLRegFixedleIncome:
         self.entry_redemption.grid(row=2, column=1)
 
         # EXPIRATION
-        label_expiration = ttk.Label(self.top_level,
+        label_expiration = ttk.Label(self,
                                     text='Vencimento:',
                                     style='RF.TLabel',
                                     )
         label_expiration.grid(row=3, column=0)
 
-        self.entry_expiration = ttk.Entry(self.top_level,
+        self.entry_expiration = ttk.Entry(self,
                                           width=15,
                                           font='arial 20',
                                           state='disabled',
@@ -447,13 +445,13 @@ class TLRegFixedleIncome:
         self.entry_expiration.grid(row=3, column=1)
 
         # PROFITABILITY
-        label_profitability = ttk.Label(self.top_level,
+        label_profitability = ttk.Label(self,
                                        text='Rentabilidade:',
                                        style='RF.TLabel',
                                        )
         label_profitability.grid(row=4, column=0)
 
-        self.entry_profitability = ttk.Entry(self.top_level,
+        self.entry_profitability = ttk.Entry(self,
                                           width=15,
                                           font='arial 20',
                                           state='disabled',
@@ -461,7 +459,7 @@ class TLRegFixedleIncome:
         self.entry_profitability.grid(row=4, column=1)
 
         # PAYMENT
-        self.frame_payment = ttk.Frame(self.top_level, style='RF.TFrame')
+        self.frame_payment = ttk.Frame(self, style='RF.TFrame')
         self.frame_payment.grid(row=5, column=0, columnspan=2)
         
         label_payment = ttk.Label(self.frame_payment,
@@ -477,7 +475,7 @@ class TLRegFixedleIncome:
                                       )
 
         # OPTIONS
-        self.frame = ttk.Frame(self.top_level, style='RF.TFrame')
+        self.frame = ttk.Frame(self, style='RF.TFrame')
         self.frame.grid(row=0, column=0, columnspan=2, pady=(10, 0))
         
         self.options = ttk.Combobox(self.frame,
@@ -496,12 +494,12 @@ class TLRegFixedleIncome:
         self.button_validate.pack(side='left')
         
         # BUTTONS TO CANCEL AND REGISTER
-        self.frame_buttons = ttk.Frame(self.top_level, style='RF.TFrame')
+        self.frame_buttons = ttk.Frame(self, style='RF.TFrame')
         self.frame_buttons.grid(row=6, column=0, columnspan=2)
         
         self.button_cancel = ttk.Button(self.frame_buttons,
                                         text='CANCELAR',
-                                        command=self.top_level.destroy,
+                                        command=self.destroy,
                                         )
         self.button_cancel.grid(row=0, column=0, pady=(10))
         
@@ -549,43 +547,45 @@ class TLRegFixedleIncome:
         redemption = self.entry_redemption.get().upper()
         expiration = self.entry_expiration.get().upper()
         profitability = self.entry_profitability.get().upper()
+        payment = self.entry_payment.get().upper()
         
         list_one = [name, redemption, expiration, profitability]
+        list_two = [name, redemption, expiration, profitability, payment]
         
         try:
-            if not self.check_one(list_one):
-                showerror(message='Verifique os dados informados.')
-                return
-            
-            elif self.state == 'Renda Fixa':
-                self.rep_rf.criar_renda_fixa(name,
-                                            redemption,
-                                            expiration,
-                                            profitability,
-                                            )
-                self.entry_name.delete(0, 'end')
-                self.entry_redemption.delete(0, 'end')
-                self.entry_expiration.delete(0, 'end')
-                self.entry_profitability.delete(0, 'end')
-                showinfo(message='Ativo cadastrado com sucesso')
+            if self.state == 'Renda Fixa':
+                if not self.check_one(list_one):
+                    showerror(message='Verifique os dados informados')
+                else:
+                    self.rep_rf.criar_renda_fixa(name,
+                                                redemption,
+                                                expiration,
+                                                profitability,
+                                                )
+                    self.entry_name.delete(0, 'end')
+                    self.entry_redemption.delete(0, 'end')
+                    self.entry_expiration.delete(0, 'end')
+                    self.entry_profitability.delete(0, 'end')
+                    showinfo(message='Ativo cadastrado com sucesso')
             
             elif self.state == 'Reserva de Emergência':
-                self.rep_rf.criar_reserva_emergencia(name,
-                                                    redemption,
-                                                    expiration,
-                                                    profitability,
-                                                    )
-                showinfo(message='Ativo cadastrado com sucesso')
-            
-            elif self.state == 'Tesouro Direto':            
-                payment = self.entry_payment.get().upper()
-                
-                list_one.append(payment)
-                
                 if not self.check_one(list_one):
-                    showerror(message='Verifique os dados informados.')
-                    return
-
+                    showerror(message='Verifique os dados informados')
+                else:
+                    self.rep_rf.criar_reserva_emergencia(name,
+                                                        redemption,
+                                                        expiration,
+                                                        profitability,
+                                                        )
+                    self.entry_name.delete(0, 'end')
+                    self.entry_redemption.delete(0, 'end')
+                    self.entry_expiration.delete(0, 'end')
+                    self.entry_profitability.delete(0, 'end')
+                    showinfo(message='Ativo cadastrado com sucesso')
+            
+            elif self.state == 'Tesouro Direto':
+                if not self.check_one(list_two):
+                    showerror(message='Verifique os dados informados')
                 else:
                     self.rep_rf.criar_tesouro_direto(name,
                                                     redemption,
@@ -593,19 +593,32 @@ class TLRegFixedleIncome:
                                                     profitability,
                                                     payment,
                                                     )
+                    self.entry_name.delete(0, 'end')
+                    self.entry_redemption.delete(0, 'end')
+                    self.entry_expiration.delete(0, 'end')
+                    self.entry_profitability.delete(0, 'end')
+                    self.entry_payment.delete(0, 'end')
                     showinfo(message='Ativo cadastrado com sucesso')
                 
         except AtivoJaCadastradoError:
             showerror(message='Ativo já cadastrado na base de dados.')
+    
+    def check_one(self, list):
+        amount: int = int(len(list))
+        res_cont: int = int(sum([(1) for i in list if len(i) != 0]))
+        if res_cont < amount:
+            return False
+        else:
+            return True
 
-    @staticmethod
-    def check_one(tuple_of_data):
-        for l in tuple_of_data:
-            if len(l) <= 0:
-                return False
-            else:
-                return True
-
+class ListProducts(Toplevel):
+    
+    def __init__(self, master):
+        Toplevel.__init__(self, master)
+        self.title('Ativos')
+        self.configure(background='#000000')
+        GeneralFunctions.set_size_window(self, 1200, 600)
+                
 
 class GeneralFunctions:
     @staticmethod
