@@ -57,13 +57,13 @@ class ButtonMenu(ttk.Frame):
 
         button_register = ttk.Button(self,
                                     text='CADASTRAR',
-                                    command=lambda: TopLevelRegister(self.master),
+                                    command=lambda: TopLevelRegister(master),
                                     )
         button_register.grid(row=0, column=0, padx=10, pady=10)
 
         button_list = ttk.Button(self,
                                     text='ATIVOS',
-                                    command=lambda: ListProducts(self.master))
+                                    command=lambda: ListProducts(master))
         button_list.grid(row=1, column=0, padx=10, pady=10)
 
         button_sell = ttk.Button(self,
@@ -617,7 +617,37 @@ class ListProducts(Toplevel):
         Toplevel.__init__(self, master)
         self.title('Ativos')
         self.configure(background='#000000')
-        GeneralFunctions.set_size_window(self, 1200, 600)            
+        GeneralFunctions.set_size_window(self, 1200, 600)
+
+        columns = ('id',
+                   'nome',
+                   'quantidade',
+                   'categoria',
+                   'resgate',
+                   'valor_aplicado',
+                   'vencimento',
+                   'rentabilidade',
+                   )
+
+        tree = ttk.Treeview(self, columns=columns, show='headings')
+
+        tree.heading('id', text='ID')
+        tree.heading('nome', text='NOME')
+        tree.heading('quantidade', text='QUANTIDADE')
+        tree.heading('categoria', text='CATEGORIA')
+        tree.heading('resgate', text='RESGATE')
+        tree.heading('valor_aplicado', text='VALOR APLICADO')
+        tree.heading('vencimento', text='VENCIMENTO')
+        tree.heading('rentabilidade', text='RENTABILIDADE')
+
+        rep_rf = RepositorioRendaFixa()
+
+        for data in rep_rf.relatorio_for_tkinter():
+            tree.insert('', 'end', values=data)
+
+        tree.grid(row=0, column=0, sticky=('n', 's', 'e', 'w'))
+
+        scroll = ttk.Scrollbar(self)
                 
 
 class GeneralFunctions:

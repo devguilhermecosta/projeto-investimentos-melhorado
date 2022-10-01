@@ -156,6 +156,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
 
         return tot
 
+
 class RepositorioRendaFixa(MetodosSqlRF):      
     def cadastrar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
         """
@@ -299,3 +300,13 @@ class RepositorioRendaFixa(MetodosSqlRF):
                 tot += float(item[5])
         
         return tot
+
+    def relatorio_for_tkinter(self) -> list:
+        acao: str = "SELECT * FROM RF"
+        self._cursor.execute(acao)
+        rep: list = []
+
+        for i in self._cursor.fetchall():
+            res: list = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]]
+            rep.append(res)
+        return rep
