@@ -617,7 +617,7 @@ class ListProducts(Toplevel):
         Toplevel.__init__(self, master)
         self.title('Ativos')
         self.configure(background='#000000')
-        GeneralFunctions.set_size_window(self, 1200, 600)
+        GeneralFunctions.set_size_window(self, 1200, 600)            
                 
 
 class GeneralFunctions:
