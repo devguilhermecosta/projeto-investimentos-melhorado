@@ -1,5 +1,5 @@
 from time import sleep
-from tkinter import Toplevel, ttk
+from tkinter import Toplevel, font, ttk
 from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
 from ativo_factory import AtivoFactory
@@ -62,12 +62,12 @@ class ButtonMenu(ttk.Frame):
         button_register.grid(row=0, column=0, padx=10, pady=10)
 
         button_list = ttk.Button(self,
-                                    text='ATIVOS',
+                                    text='RENDA FIXA',
                                     command=lambda: ListProducts(master))
         button_list.grid(row=1, column=0, padx=10, pady=10)
 
         button_sell = ttk.Button(self,
-                                text='VENDER',
+                                text='RENDA VARIÁVEL',
                                 command=None,
                                 )
         button_sell.grid(row=2, column=0, padx=10, pady=10)
@@ -629,26 +629,61 @@ class ListProducts(Toplevel):
                    'rentabilidade',
                    )
 
-        tree = ttk.Treeview(self, columns=columns, show='headings')
+        s = ttk.Style()
+        s.configure('Treeview', font='arial 14')
+        s.configure('Heading', font='arial 14', foreground='black')
+        s.configure('AT.TFrame', background='#000000')
 
-        tree.heading('id', text='ID')
-        tree.heading('nome', text='NOME')
-        tree.heading('quantidade', text='QUANTIDADE')
-        tree.heading('categoria', text='CATEGORIA')
-        tree.heading('resgate', text='RESGATE')
-        tree.heading('valor_aplicado', text='VALOR APLICADO')
-        tree.heading('vencimento', text='VENCIMENTO')
-        tree.heading('rentabilidade', text='RENTABILIDADE')
+        self.tree = ttk.Treeview(self, columns=columns, show='headings', height=25)
 
+        self.tree.heading('id', text='ID')
+        self.tree.heading('nome', text='NOME')
+        self.tree.heading('quantidade', text='QUANTIDADE')
+        self.tree.heading('categoria', text='CATEGORIA')
+        self.tree.heading('resgate', text='RESGATE')
+        self.tree.heading('valor_aplicado', text='VALOR APLICADO')
+        self.tree.heading('vencimento', text='VENCIMENTO')
+        self.tree.heading('rentabilidade', text='RENTABILIDADE')
+
+        self.tree.column(column=0, width=30, anchor='center', stretch=True)
+        self.tree.column(column=1, anchor='center', stretch=True)
+        self.tree.column(column=2, width=130, anchor='center', stretch=True)
+        self.tree.column(column=3, width=140, anchor='center', stretch=True)
+        self.tree.column(column=4, width=140, anchor='center', stretch=True)
+        self.tree.column(column=5, anchor='center', stretch=True)
+        self.tree.column(column=6, width=140, anchor='center', stretch=True)
+        self.tree.column(column=7, anchor='center', stretch=True)
+
+        self.list_items()
+
+        self.tree.grid(row=0, column=0, sticky=('n', 's', 'e', 'w'))
+        self.tree.bind('<<TreeviewSelect>>', self.item_selected)
+
+        scroll = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scroll.set)
+        scroll.grid(row=0, column=1, sticky=('n', 's'))
+
+        frame = ttk.Frame(self, style='AT.TFrame')
+        frame.grid(row=1, column=0, columnspan=2)
+
+        self.button_purchase = ttk.Button(frame,
+                                     text='Comprar',
+                                     state='disabled',
+                                     command=None)
+        self.button_purchase.grid(row=0, column=0, pady=(5, 10))
+    
+    def list_items(self):
         rep_rf = RepositorioRendaFixa()
 
         for data in rep_rf.relatorio_for_tkinter():
-            tree.insert('', 'end', values=data)
+            self.tree.insert('', 'end', values=data)
+    
+    def item_selected(self, *args):
+        self.button_purchase['state'] = 'enable'
+        for selected_item in self.tree.selection():
+            item: list = self.tree.item(selected_item)['values']
+            print(item[1])
 
-        tree.grid(row=0, column=0, sticky=('n', 's', 'e', 'w'))
-
-        scroll = ttk.Scrollbar(self)
-                
 
 class GeneralFunctions:
     @staticmethod
