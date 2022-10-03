@@ -671,7 +671,7 @@ class ListProducts(Toplevel):
                                      state='disabled',
                                      command=None)
         self.button_purchase.grid(row=0, column=0, pady=(5, 10))
-    
+
     def list_items(self):
         rep_rf = RepositorioRendaFixa()
 
