@@ -774,7 +774,7 @@ class ListProducts(Toplevel):
         
     def purchase(self):
         amount = self.amount_entry.get()
-        value = self.value_entry.get()
+        value = self.value_entry.get().replace(',', '.')
         code: str = str(self.item[1])
                 
         try:
