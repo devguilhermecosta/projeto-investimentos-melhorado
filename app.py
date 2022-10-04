@@ -1,5 +1,5 @@
 from time import sleep
-from tkinter import Toplevel, font, ttk
+from tkinter import Toplevel, font, ttk, StringVar
 from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
 from ativo_factory import AtivoFactory
@@ -611,6 +611,7 @@ class TLRegFixedleIncome(Toplevel):
         else:
             return True
 
+
 class ListProducts(Toplevel):
     
     def __init__(self, master):
@@ -618,7 +619,17 @@ class ListProducts(Toplevel):
         self.title('Ativos')
         self.configure(background='#000000')
         GeneralFunctions.set_size_window(self, 1200, 600)
+        
+        # VARIABLES
+        self.rep_rf = RepositorioRendaFixa()
 
+        # STYLES 
+        s = ttk.Style()
+        s.configure('Treeview', font='arial 14')
+        s.configure('Heading', font='arial 14', foreground='white', background='black')
+        s.configure('AT.TFrame', background='#000000')
+        
+        # COLUMNS OF TREEVIEW
         columns = ('id',
                    'nome',
                    'quantidade',
@@ -628,12 +639,8 @@ class ListProducts(Toplevel):
                    'vencimento',
                    'rentabilidade',
                    )
-
-        s = ttk.Style()
-        s.configure('Treeview', font='arial 14')
-        s.configure('Heading', font='arial 14', foreground='black')
-        s.configure('AT.TFrame', background='#000000')
-
+        
+        # TREEVIEW
         self.tree = ttk.Treeview(self, columns=columns, show='headings', height=25)
 
         self.tree.heading('id', text='ID')
@@ -654,35 +661,135 @@ class ListProducts(Toplevel):
         self.tree.column(column=6, width=140, anchor='center', stretch=True)
         self.tree.column(column=7, anchor='center', stretch=True)
 
+        # INSERT ITENS INTO TREEVIEW
         self.list_items()
 
         self.tree.grid(row=0, column=0, sticky=('n', 's', 'e', 'w'))
         self.tree.bind('<<TreeviewSelect>>', self.item_selected)
-
+        
+        # SCROLLBAR
         scroll = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll.set)
         scroll.grid(row=0, column=1, sticky=('n', 's'))
 
+        # FRAME FOR BUTTONS
         frame = ttk.Frame(self, style='AT.TFrame')
         frame.grid(row=1, column=0, columnspan=2)
 
+        # BUTTONS
         self.button_purchase = ttk.Button(frame,
                                      text='Comprar',
                                      state='disabled',
-                                     command=None)
+                                     command=self.top_level_purchase,
+                                     )
         self.button_purchase.grid(row=0, column=0, pady=(5, 10))
 
     def list_items(self):
-        rep_rf = RepositorioRendaFixa()
-
-        for data in rep_rf.relatorio_for_tkinter():
+        for data in self.rep_rf.relatorio_for_tkinter():
             self.tree.insert('', 'end', values=data)
     
     def item_selected(self, *args):
         self.button_purchase['state'] = 'enable'
         for selected_item in self.tree.selection():
             item: list = self.tree.item(selected_item)['values']
-            print(item[1])
+            return item
+            
+    def top_level_purchase(self):
+        self.top_l = Toplevel(self)
+        self.top_l.title('Comprar ativo')
+        self.top_l.configure(background='#000000')
+        GeneralFunctions.set_size_window(self.top_l, 400, 250)
+        
+        # STYLES
+        s = ttk.Style()
+        s.configure('TFrame', background='#000000')
+        s.configure('TLabel',
+                    background='#000000',
+                    font='arial 16')
+        
+        # PRODUCT
+        self.item: list = self.item_selected()        
+        
+        # FRAME
+        frame = ttk.Frame(self.top_l)
+        frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # FRAME_2
+        frame_2 = ttk.Frame(self.top_l)
+        frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # LABEL AND ENTRY FOR DATA
+        label_id = ttk.Label(frame,
+                             text='ID:',
+                             )
+        label_id.grid(row=0, column=0)
+        
+        entry_id = ttk.Entry(frame,
+                             font='arial 16',
+                             )
+        entry_id.insert('end', self.item[0])
+        entry_id.grid(row=0, column=1)
+        
+        label_name = ttk.Label(frame,
+                               text='Nome:',
+                               )
+        label_name.grid(row=1, column=0)
+        
+        entry_name = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        entry_name.insert('end', self.item[1])
+        entry_name.grid(row=1, column=1)
+        
+        # LABEL AND ENTRY FOR PURCHASE        
+        label_amount = ttk.Label(frame_2,
+                                 text='Quantidade:',
+                                 )
+        label_amount.grid(row=0, column=0)
+        
+        self.amount_entry = ttk.Entry(frame_2,
+                                 font='arial 16',
+                                 width=6,
+                                 )
+        self.amount_entry.grid(row=0, column=1)
+        
+        label_value = ttk.Label(frame_2,
+                                text='Valor:',
+                                )
+        label_value.grid(row=1, column=0)
+        
+        self.value_entry = ttk.Entry(frame_2,
+                                font='arial 16',
+                                width=6,
+                                )
+        self.value_entry.grid(row=1, column=1)
+        
+        # BUTTON FOR PURCHASE        
+        button_purchase = ttk.Button(frame_2,
+                                     text='Confirmar',
+                                     width=10,
+                                     command=self.purchase,
+                                     )
+        button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
+        
+    def purchase(self):
+        amount = self.amount_entry.get()
+        value = self.value_entry.get()
+        code: str = str(self.item[1])
+                
+        try:
+            if not amount or not value or amount =='' or value == '':
+                showerror(message="Verifique a quantidade e valor informados")
+                return
+            else:
+                self.rep_rf.comprar(code, int(amount), float(value))
+                showinfo(message=f'Compra realizada com sucesso')
+                self.top_l.destroy()
+        except ValueError:
+            showerror(message='Entrada de dados inválida')
+        except Exception as error:
+            print(error)
+            showerror(message=f'Error: {error}')
 
 
 class GeneralFunctions:

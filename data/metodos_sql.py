@@ -179,16 +179,16 @@ class MetodosSqlRF:
         else:
             return False
     
-    def _get_id(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int:
+    def _get_id(self, nome: str) -> int:
         """      
-        Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
+        Param: nome: -> Nome do ativo
         return int -> -1 se não existir ou o próprio id
         """
         resultado: int = -1
         acao: str = "SELECT * FROM RF WHERE nome=?"
-        self._cursor.execute(acao, (ativo.nome,))
+        self._cursor.execute(acao, (nome,))
         for at in self._cursor.fetchall():
-            if at[1] == ativo.nome:
+            if at[1] == nome:
                 resultado = at[0]       
         return resultado
 
@@ -241,9 +241,9 @@ class MetodosSqlRF:
             novo_valor: float = valor_atual + valor
             
             acao_2: str = "UPDATE RF SET quantidade=?, valor_aplicado=? WHERE id=?"
-            self._cursor.execute(acao_2, (nova_qtde, novo_valor, at[0]))
+            self._cursor.execute(acao_2, (nova_qtde, novo_valor, str(at[0])))
             self._conn.commit()
-            
+    
     def acao_sql_alterar_dados(self,
                                  ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
                                  nome: str,
