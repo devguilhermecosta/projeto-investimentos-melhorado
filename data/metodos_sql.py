@@ -261,13 +261,14 @@ class MetodosSqlRF:
                 self._cursor.execute(acao_2, (n_nome, n_data_resgate, n_vencimento, n_rent, at[0]))
                 self._conn.commit()
     
-    def acao_sql_acertar_valor_aplicado(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia, valor: float) -> None:
+    def acao_sql_acertar_valor_aplicado(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia, valor: float, quantidade: int) -> None:
         self.__sub_acao_sql_select_all_com_id(ativo)      
         for at in self._cursor.fetchall():
             novo_valor: float = valor
+            nova_qtde: int = quantidade
 
-            acao_2: str = "UPDATE RF SET valor_aplicado=? WHERE id=?"
-            self._cursor.execute(acao_2, (novo_valor, at[0]))
+            acao_2: str = "UPDATE RF SET quantidade=?, valor_aplicado=? WHERE id=?"
+            self._cursor.execute(acao_2, (nova_qtde, novo_valor, at[0]))
             self._conn.commit()
             
     def acao_sql_deletar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> None:

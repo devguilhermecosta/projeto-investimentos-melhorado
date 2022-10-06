@@ -239,7 +239,8 @@ class RepositorioRendaFixa(MetodosSqlRF):
         
     def acertar_valor_aplicado(self,
                                ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
-                               valor: float) -> int | None:
+                               valor: float,
+                               quantidade) -> int | None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: valor: float
@@ -251,7 +252,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
         if not self._existe(ativo):
             raise AtivoNaoCadastradoError('Ativo não cadastrado')
         else:
-            self.acao_sql_acertar_valor_aplicado(ativo, valor)
+            self.acao_sql_acertar_valor_aplicado(ativo, valor, quantidade)
             return 0
         
     def deletar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
