@@ -846,7 +846,41 @@ class ListProducts(Toplevel):
         choices = ['Renda Fixa', 'Tesouro Direto', 'Reserva de Emergência']
         self.entry_category = ttk.Combobox(frame, values=choices, font='arial 14')
         self.entry_category.grid(row=1, column=1)
+        self.entry_category.set(self.item[3])
         self.entry_category.bind('<<ComboboxSelected>>', self.get_category)
+
+        label_redeem = ttk.Label(frame,
+                                 text='Regate:',
+                                 )
+        label_redeem.grid(row=2, column=0)
+
+        self.entry_redeem = ttk.Entry(frame,
+                                 font='arial 16',
+                                 )
+        self.entry_redeem.grid(row=2, column=1)
+        self.entry_redeem.insert('end', self.item[4])
+
+        label_expiration = ttk.Label(frame,
+                                     text='Vencimento',
+                                     )
+        label_expiration.grid(row=3, column=0)
+
+        self.entry_expiration = ttk.Entry(frame,
+                                     font='arial 16',
+                                     )
+        self.entry_expiration.grid(row=3, column=1)
+        self.entry_expiration.insert('end', self.item[6])
+
+        label_profitability = ttk.Label(frame,
+                                        text='Rentabilidade',
+                                        )
+        label_profitability.grid(row=4, column=0)
+
+        self.entry_profitability = ttk.Entry(frame,
+                                        font='arial 16',
+                                        )
+        self.entry_profitability.grid(row=4, column=1)
+        self.entry_profitability.insert('end', self.item[7])
 
         # BUTTON FOR CHANGE DATA  
         button_purchase = ttk.Button(frame_2,
@@ -854,12 +888,7 @@ class ListProducts(Toplevel):
                                      width=10,
                                      command=self.change_value_amount,
                                      )
-        button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
-    
-    def get_category(self):
-        self.entry_category.select_clear()
-        item = self.entry_category.get([0])
-        print(item)
+        button_purchase.grid(row=2, column=0, columnspan=2, pady=(5, 0))
     
     def top_level_del(self):
         self.top_level_del = Toplevel(self)
@@ -1039,9 +1068,11 @@ class ListProducts(Toplevel):
             showerror(message='Entrada de dados inválida')
         except Exception as error:
             showerror(message=f'Error: {error}')
-        
 
-
+    def get_category(self, event):
+        self.entry_category.select_clear()
+        item = self.entry_category.get()
+        return item  
 
 
 class GeneralFunctions:
