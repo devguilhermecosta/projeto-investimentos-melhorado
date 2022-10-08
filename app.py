@@ -1,8 +1,5 @@
-from email.errors import MessageParseError
-from logging import exception
-from msilib.schema import ComboBox
 from time import sleep
-from tkinter import Listbox, Toplevel, font, ttk, StringVar
+from tkinter import Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
 from ativo_factory import AtivoFactory
@@ -32,7 +29,11 @@ class PyInvest:
         self.frame_report.configure(relief='ridge',
                                     borderwidth=2,
                                     )
-        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=('n', 'e', 's', 'w'))
+        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=('n', 'e', 's', 'w',))
+
+        # ADAPTATIVE
+        self.master.columnconfigure(1, weight=1)
+        self.master.rowconfigure(0, weight=1)
 
         # INFINITE LOOP
         self.master.mainloop()
@@ -58,88 +59,108 @@ class ButtonMenu(ttk.Frame):
                 foreground=[('pressed', '#575757')]
                     )
 
+        sticky = ('n', 'e', 's', 'w',)
+
         button_register = ttk.Button(self,
                                     text='CADASTRAR',
                                     command=lambda: TopLevelRegister(master),
                                     )
-        button_register.grid(row=0, column=0, padx=10, pady=10)
+        button_register.grid(row=0, column=0, padx=10, pady=10, sticky=sticky)
 
         button_list = ttk.Button(self,
                                     text='RENDA FIXA',
                                     command=lambda: ListProductsRF(master))
-        button_list.grid(row=1, column=0, padx=10, pady=10)
+        button_list.grid(row=1, column=0, padx=10, pady=10, sticky=sticky)
 
         button_sell = ttk.Button(self,
                                 text='RENDA VARIÁVEL',
                                 command=None,
                                 )
-        button_sell.grid(row=2, column=0, padx=10, pady=10)
+        button_sell.grid(row=2, column=0, padx=10, pady=10, sticky=sticky)
 
         button_m_value = ttk.Button(self,
                                     text='ACERTAR VALOR',
                                     command=None,
                                     )
-        button_m_value.grid(row=3, column=0, padx=10, pady=10)
+        button_m_value.grid(row=3, column=0, padx=10, pady=10, sticky=sticky)
 
         button_m_amount = ttk.Button(self,
                                     text='ACERTAR QTDE',
                                     command=None,
                                     )
-        button_m_amount.grid(row=4, column=0, padx=10, pady=10)
+        button_m_amount.grid(row=4, column=0, padx=10, pady=10, sticky=sticky)
 
         button_delete = ttk.Button(self,
                                     text='EXCLUIR',
                                     command=None,
                                     )
-        button_delete.grid(row=5, column=0, padx=10, pady=10)
+        button_delete.grid(row=5, column=0, padx=10, pady=10, sticky=sticky)
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, weight=1)
 
 
 class FrameReport(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
 
-        # LABELS FOR REPORTS
+        # STYLES
         s = ttk.Style()
-        s.configure('L.TLabel', font='arial, 20', foreground='white', background='black')
+        s.configure('L.TLabel', font='arial, 20', foreground='white', background='black',
+                     anchor='center')
+        s.configure('T.TLabel', font='arial, 24 bold', foreground='#10EB4E', background='black',
+                     anchor='center')
         s.configure('TFrame', background='black')
 
+        # LABELS FOR REPORTS
         label_actions = ttk.Label(self,
                                   text=f'Total investido em Ações: R$ {self.report_actions()}',
                                   style='L.TLabel',
                                   )
-        label_actions.grid(row=0, column=0, padx=5, pady=5)
+        label_actions.grid(row=0, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
 
         label_fii = ttk.Label(self,
                               text=f'Total investido em FIIs: R$ {self.report_fiis()}',
                               style='L.TLabel',
                               )
-        label_fii.grid(row=1, column=0, padx=5, pady=5)
+        label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
 
         label_direct_treasure = ttk.Label(self,
                                           text=f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}',
                                           style='L.TLabel',
                                           )
-        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5)
+        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
 
         label_fixed_income = ttk.Label(self,
                                        text=f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}',
                                        style='L.TLabel',
                                        )
-        label_fixed_income.grid(row=3, column=0, padx=5, pady=5)
+        label_fixed_income.grid(row=3, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
 
         label_emergency_reserve = ttk.Label(self,
                                             text=f'Total na Reserva de Emergência: R${self.report_emergency_reserv()}',
                                             style='L.TLabel',
                                             )
-        label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5)
+        label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
 
         label_total_invest = ttk.Label(self,
                                        text=f'Total investido: R$ {self.report_total_invested()}',
-                                       font='arial 24 bold',
-                                       foreground='#009E2D',
-                                       background='black',
+                                       style='T.TLabel',
                                        )
-        label_total_invest.grid(row=5, column=0)
+        label_total_invest.grid(row=5, column=0, sticky=('n', 'e', 's', 'w',))
+
+        # ADAPTATIVE
+        self.columnconfigure(0, weight=3)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, weight=1)
     
     def report_actions(self):
         rep = RepositorioRendaVariavel()
@@ -969,6 +990,7 @@ class ListProductsRF(Toplevel):
                              font='arial 16',
                              )
         entry_id.insert('end', self.item[0])
+        entry_id['state'] = 'disabled'
         entry_id.grid(row=0, column=1)
         
         label_name = ttk.Label(frame,
@@ -980,6 +1002,7 @@ class ListProductsRF(Toplevel):
                                font='arial 16',
                                )
         entry_name.insert('end', self.item[1])
+        entry_name['state'] = 'disabled'
         entry_name.grid(row=1, column=1)
 
         label_amount = ttk.Label(frame_2,
@@ -1017,7 +1040,7 @@ class ListProductsRF(Toplevel):
     def purchase(self):
         amount = self.amount_entry.get()
         value = self.value_entry.get().replace(',', '.')
-        code: str = str(self.item[1])
+        code: str = str(self.item[0])
                 
         try:
             if not amount or not value or amount =='' or value == '':
@@ -1026,6 +1049,7 @@ class ListProductsRF(Toplevel):
             else:
                 self.rep_rf.comprar(code, int(amount), float(value))
                 showinfo(message=f'Compra realizada com sucesso')
+                self.refresh()
                 self.top_l.destroy()
         except ValueError:
             showerror(message='Entrada de dados inválida')
@@ -1037,12 +1061,13 @@ class ListProductsRF(Toplevel):
         try:
             self.rep_rf.deletar_ativo(code)
             showinfo(message=f'Ativo deletado com sucesso')
+            self.refresh()
             self.top_level_del.destroy()
         except Exception as error:
             showerror(message=f'Error: {error}')
     
     def change_value_amount(self):
-        code: str = str(self.item[1])
+        code: str = str(self.item[0])
         amount = self.amount_entry.get()
         value = self.value_entry.get().replace(',', '.')
 
@@ -1053,6 +1078,7 @@ class ListProductsRF(Toplevel):
             else:
                 self.rep_rf.acertar_valor_aplicado(code, float(value), int(amount))
                 showinfo(message=f'Dados alterados com sucesso')
+                self.refresh()
                 self.top_level_change.destroy()
         except ValueError:
             showerror(message='Entrada de dados inválida')
@@ -1084,6 +1110,7 @@ class ListProductsRF(Toplevel):
                                                 expiration,
                                                 profitability,
                                                 )
+                self.refresh()
                 showinfo(title='OK', message='Dados alterados com sucesso')
         except AtivoJaCadastradoError:
             showerror(title='Error', message='Este ativo já existe na base de dados.')
@@ -1093,6 +1120,12 @@ class ListProductsRF(Toplevel):
             showerror(title='Error', message=f'O nome "{name}" já está em uso.\n'
                       f'{error}'
                       )
+    
+    def refresh(self):
+        for record in self.tree.get_children():
+            self.tree.delete(record)
+        
+        self.list_items()
 
 
 class GeneralFunctions:

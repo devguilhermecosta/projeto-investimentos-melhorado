@@ -231,8 +231,8 @@ class MetodosSqlRF:
                                 )
         self._conn.commit()
                 
-    def acao_sql_comprar(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia, qtde: int, valor: float) -> None:
-        self.__sub_acao_sql_select_all_com_id(ativo)
+    def acao_sql_comprar(self, id, qtde: int, valor: float) -> None:
+        self.__sub_acao_sql_select_all_com_id(id)
         for at in self._cursor.fetchall():
             qtde_atual: int = at[2]
             valor_atual: float = at[5]
@@ -263,8 +263,8 @@ class MetodosSqlRF:
                 self._cursor.execute(acao_2, (n_nome, n_categoria, n_data_resgate, n_vencimento, n_rent, id))
                 self._conn.commit()
     
-    def acao_sql_acertar_valor_aplicado(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia, valor: float, quantidade: int) -> None:
-        self.__sub_acao_sql_select_all_com_id(ativo)      
+    def acao_sql_acertar_valor_aplicado(self, id: str, valor: float, quantidade: int) -> None:
+        self.__sub_acao_sql_select_all_com_id(id)      
         for at in self._cursor.fetchall():
             novo_valor: float = valor
             nova_qtde: int = quantidade

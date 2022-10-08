@@ -186,12 +186,10 @@ class RepositorioRendaFixa(MetodosSqlRF):
         return int -> -1 se não comprado ou 0 se comprado
         """
         resultado: int = -1
-        if not self._existe(ativo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
+        try:
             self.acao_sql_comprar(ativo, qtde, valor)
-            resultado = 0
-        return resultado
+        except AtivoNaoCadastradoError:
+            print('Ativo não cadastrado')
     
     def resgatar(self,
                  ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
@@ -250,11 +248,10 @@ class RepositorioRendaFixa(MetodosSqlRF):
         
         return 0 or None
         """
-        if not self._existe(ativo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
+        try:
             self.acao_sql_acertar_valor_aplicado(ativo, valor, quantidade)
-            return 0
+        except AtivoNaoCadastradoError:
+            print('Ativo não cadastrado')
         
     def deletar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
         """
