@@ -1,3 +1,5 @@
+from email.errors import MessageParseError
+from logging import exception
 from msilib.schema import ComboBox
 from time import sleep
 from tkinter import Listbox, Toplevel, font, ttk, StringVar
@@ -64,7 +66,7 @@ class ButtonMenu(ttk.Frame):
 
         button_list = ttk.Button(self,
                                     text='RENDA FIXA',
-                                    command=lambda: ListProducts(master))
+                                    command=lambda: ListProductsRF(master))
         button_list.grid(row=1, column=0, padx=10, pady=10)
 
         button_sell = ttk.Button(self,
@@ -98,7 +100,8 @@ class FrameReport(ttk.Frame):
 
         # LABELS FOR REPORTS
         s = ttk.Style()
-        s.configure('L.TLabel', font='arial, 20', foreground='white')
+        s.configure('L.TLabel', font='arial, 20', foreground='white', background='black')
+        s.configure('TFrame', background='black')
 
         label_actions = ttk.Label(self,
                                   text=f'Total investido em Ações: R$ {self.report_actions()}',
@@ -134,6 +137,7 @@ class FrameReport(ttk.Frame):
                                        text=f'Total investido: R$ {self.report_total_invested()}',
                                        font='arial 24 bold',
                                        foreground='#009E2D',
+                                       background='black',
                                        )
         label_total_invest.grid(row=5, column=0)
     
@@ -613,7 +617,7 @@ class TLRegFixedleIncome(Toplevel):
             return True
 
 
-class ListProducts(Toplevel):
+class ListProductsRF(Toplevel):
     
     def __init__(self, master):
         Toplevel.__init__(self, master)
@@ -624,11 +628,25 @@ class ListProducts(Toplevel):
         # VARIABLES
         self.rep_rf = RepositorioRendaFixa()
 
-        # STYLES 
-        s = ttk.Style()
-        s.configure('Treeview', font='arial 14')
-        s.configure('Heading', font='arial 14', foreground='white', background='black')
-        s.configure('AT.TFrame', background='#000000')
+        # STYLES
+        self.s = ttk.Style()
+        self.s.configure('TFrame',
+                         background='#000000',
+                         )
+        self.s.configure('TLabel',
+                         background='#000000',
+                         font='arial 16')
+        self.s.configure('Treeview',
+                         font='arial 14',
+                         )
+        self.s.configure('Heading',
+                         font='arial 14',
+                         foreground='white',
+                         background='black',
+                         )
+        self.s.configure('AT.TFrame',
+                         background='#000000',
+                         )
         
         # COLUMNS OF TREEVIEW
         columns = ('id',
@@ -694,19 +712,19 @@ class ListProducts(Toplevel):
                                       )
         self.button_del.grid(row=0, column=1, pady=(5, 10), padx=10)
 
-        self.button_redeem = ttk.Button(frame,
-                                         text='Resgatar',
+        self.button_edit = ttk.Button(frame,
+                                         text='Editar',
                                          state='disabled',
                                          width=8,
-                                         command=self.top_level_redeem,
+                                         command=self.top_level_set_data,
                                          )
-        self.button_redeem.grid(row=0, column=2, pady=(5, 10), padx=10)
+        self.button_edit.grid(row=0, column=2, pady=(5, 10), padx=10)
 
         self.button_change_data = ttk.Button(frame,
                                              text='Acertar valores',
                                              state='disabled',
                                              width=15,
-                                             command=self.top_level_change_data,
+                                             command=self.top_level_amount_value,
                                              )
         self.button_change_data.grid(row=0, column=3, pady=(5, 10), padx=10)
 
@@ -718,7 +736,7 @@ class ListProducts(Toplevel):
         self.button_purchase['state'] = 'enable'
         self.button_del['state'] = 'enable'
         self.button_change_data['state'] = 'enable'
-        self.button_redeem['state'] = 'enable'
+        self.button_edit['state'] = 'enable'
 
         for selected_item in self.tree.selection():
             item: list = self.tree.item(selected_item)['values']
@@ -729,16 +747,9 @@ class ListProducts(Toplevel):
         self.top_l.title('Comprar ativo')
         self.top_l.configure(background='#000000')
         GeneralFunctions.set_size_window(self.top_l, 400, 250)
-        
-        # STYLES
-        s = ttk.Style()
-        s.configure('TFrame', background='#000000')
-        s.configure('TLabel',
-                    background='#000000',
-                    font='arial 16')
-        
+
         # PRODUCT
-        self.item: list = self.item_selected()        
+        self.item: list = self.item_selected()      
         
         # FRAME
         frame = ttk.Frame(self.top_l)
@@ -802,18 +813,11 @@ class ListProducts(Toplevel):
                                      )
         button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
     
-    def top_level_redeem(self):
+    def top_level_set_data(self):
         self.top_level_rdm = Toplevel(self)
-        self.top_level_rdm.title('Acertar valores')
+        self.top_level_rdm.title('Alterar dados cadastrais')
         self.top_level_rdm.configure(background='#000000')
         GeneralFunctions.set_size_window(self.top_level_rdm, 400, 250)
-        
-        # STYLES
-        s = ttk.Style()
-        s.configure('TFrame', background='#000000')
-        s.configure('TLabel',
-                    background='#000000',
-                    font='arial 16')
         
         # PRODUCT
         self.item: list = self.item_selected()        
@@ -832,11 +836,11 @@ class ListProducts(Toplevel):
                                )
         label_name.grid(row=0, column=0)
         
-        entry_name = ttk.Entry(frame,
+        self.entry_name = ttk.Entry(frame,
                                font='arial 16',
                                )
-        entry_name.grid(row=0, column=1)
-        entry_name.insert('end', self.item[1])
+        self.entry_name.grid(row=0, column=1)
+        self.entry_name.insert('end', self.item[1])
 
         label_category = ttk.Label(frame,
                                    text='Categoria:',
@@ -886,7 +890,7 @@ class ListProducts(Toplevel):
         button_purchase = ttk.Button(frame_2,
                                      text='Confirmar',
                                      width=10,
-                                     command=self.change_value_amount,
+                                     command=self.set_data,
                                      )
         button_purchase.grid(row=2, column=0, columnspan=2, pady=(5, 0))
     
@@ -895,13 +899,6 @@ class ListProducts(Toplevel):
         self.top_level_del.title('Deletar ativo')
         self.top_level_del.configure(background='#000000')
         GeneralFunctions.set_size_window(self.top_level_del, 400, 200)
-        
-        # STYLES
-        s = ttk.Style()
-        s.configure('TFrame', background='#000000')
-        s.configure('TLabel',
-                    background='#000000',
-                    font='arial 16')
         
         # PRODUCT
         self.item: list = self.item_selected()        
@@ -945,19 +942,12 @@ class ListProducts(Toplevel):
                                      )
         button_sell.grid(row=2, column=0, columnspan=2, pady=(20, 0))
     
-    def top_level_change_data(self):
+    def top_level_amount_value(self):
         self.top_level_change = Toplevel(self)
         self.top_level_change.title('Acertar valores')
         self.top_level_change.configure(background='#000000')
         GeneralFunctions.set_size_window(self.top_level_change, 400, 250)
-        
-        # STYLES
-        s = ttk.Style()
-        s.configure('TFrame', background='#000000')
-        s.configure('TLabel',
-                    background='#000000',
-                    font='arial 16')
-        
+       
         # PRODUCT
         self.item: list = self.item_selected()        
         
@@ -1010,9 +1000,9 @@ class ListProducts(Toplevel):
         label_value.grid(row=1, column=0)
         
         self.value_entry = ttk.Entry(frame_2,
-                                font='arial 16',
-                                width=12,
-                                )
+                                       font='arial 16',
+                                       width=12,
+                                       )
         self.value_entry.grid(row=1, column=1)
         self.value_entry.insert('end', self.item[5])
         
@@ -1072,7 +1062,37 @@ class ListProducts(Toplevel):
     def get_category(self, event):
         self.entry_category.select_clear()
         item = self.entry_category.get()
-        return item  
+        return item
+
+    def set_data(self):
+        code: str = str(self.item[0])
+        name: str = self.entry_name.get().title()
+        category: str = self.entry_category.get()
+        redeem: str = self.entry_redeem.get()
+        expiration: str = self.entry_expiration.get()
+        profitability: str = self.entry_profitability.get()
+
+        try:
+            if not name or not category or not redeem or not expiration or not profitability:
+                showerror(message='Preencha todos os campos.')
+                return
+            else:
+                self.rep_rf.alterar_dados_ativo(code,
+                                                name,
+                                                category,
+                                                redeem,
+                                                expiration,
+                                                profitability,
+                                                )
+                showinfo(title='OK', message='Dados alterados com sucesso')
+        except AtivoJaCadastradoError:
+            showerror(title='Error', message='Este ativo já existe na base de dados.')
+        except ValueError:
+            showerror(title='Error', message='Verifique os dados informados.')
+        except Exception as error:
+            showerror(title='Error', message=f'O nome "{name}" já está em uso.\n'
+                      f'{error}'
+                      )
 
 
 class GeneralFunctions:

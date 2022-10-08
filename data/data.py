@@ -215,13 +215,14 @@ class RepositorioRendaFixa(MetodosSqlRF):
             return 0
         
     def alterar_dados_ativo(self,
-                             ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
+                             id: str,
                              nome: str,
+                             categoria: str,
                              data_resgate: str,
                              data_vencimento: str,
                              rentabilidade: str) -> int | None:
         """
-        Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
+        Param: ativo: id or code
         Param: nome: str
         Param: data_resgate: str
         Param: data_vencimento: str
@@ -231,11 +232,11 @@ class RepositorioRendaFixa(MetodosSqlRF):
         
         return 0 or None
         """
-        if not self._existe(ativo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_alterar_dados(ativo, nome, data_resgate, data_vencimento, rentabilidade)           
-            return 0
+        try:
+            self.acao_sql_alterar_dados(id, nome, categoria, data_resgate, data_vencimento,
+                                        rentabilidade)
+        except AtivoNaoCadastradoError:
+            print('Ativo não cadastrado')
         
     def acertar_valor_aplicado(self,
                                ativo: RendaFixa | TesouroDireto | ReservaEmergencia,

@@ -169,12 +169,12 @@ class MetodosSqlRF:
         self._conn = sq.connect('data/data.db')
         self._cursor = self._conn.cursor()
         
-    def _existe(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> bool:
+    def _existe(self, nome: str) -> bool:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         return bool
         """        
-        if self._get_id(ativo) != -1:
+        if self._get_id(nome) != -1:
             return True
         else:
             return False
@@ -189,7 +189,7 @@ class MetodosSqlRF:
         self._cursor.execute(acao, (nome,))
         for at in self._cursor.fetchall():
             if at[1] == nome:
-                resultado = at[0]       
+                resultado = int(at[0])
         return resultado
 
     def acao_sql_alterar_saldo_apos_resgate(self,
@@ -245,20 +245,22 @@ class MetodosSqlRF:
             self._conn.commit()
     
     def acao_sql_alterar_dados(self,
-                                 ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
-                                 nome: str,
-                                 data_resgate: str,
-                                 data_vencimento: str,
-                                 rentabilidade: str) -> None:
-            self.__sub_acao_sql_select_all_com_id(ativo)
+                                id: str,
+                                nome: str,
+                                categoria: str,
+                                data_resgate: str,
+                                data_vencimento: str,
+                                rentabilidade: str) -> None:
+            self.__sub_acao_sql_select_all_com_id(id)
             for at in self._cursor.fetchall():
                 n_nome: str = nome
+                n_categoria: str = categoria
                 n_data_resgate: str = data_resgate
                 n_vencimento: str = data_vencimento
                 n_rent: str = rentabilidade
                 
-                acao_2: str = "UPDATE RF SET nome=?, resgate=?, vencimento=?, rentabilidade=? WHERE id=?"
-                self._cursor.execute(acao_2, (n_nome, n_data_resgate, n_vencimento, n_rent, at[0]))
+                acao_2: str = "UPDATE RF SET nome=?, categoria=?, resgate=?, vencimento=?, rentabilidade=? WHERE id=?"
+                self._cursor.execute(acao_2, (n_nome, n_categoria, n_data_resgate, n_vencimento, n_rent, id))
                 self._conn.commit()
     
     def acao_sql_acertar_valor_aplicado(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia, valor: float, quantidade: int) -> None:
@@ -278,10 +280,9 @@ class MetodosSqlRF:
         self._cursor.execute(acao, (ident,))
         self._conn.commit()
         
-    def __sub_acao_sql_select_all_com_id(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> None:
-        ident: int = self._get_id(ativo)
+    def __sub_acao_sql_select_all_com_id(self, id: str) -> None:
         acao: str = "SELECT * FROM RF WHERE id=?"
-        self._cursor.execute(acao, (ident,))
+        self._cursor.execute(acao, (id,))
         
     def sair(self) -> None:
         self._conn.close()
