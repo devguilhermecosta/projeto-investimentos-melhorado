@@ -59,7 +59,7 @@ class ButtonMenu(ttk.Frame):
                 foreground=[('pressed', '#575757')]
                     )
 
-        sticky = ('n', 'e', 's', 'w',)
+        sticky: tuple = ('n', 'e', 's', 'w',)
 
         button_register = ttk.Button(self,
                                     text='CADASTRAR',
@@ -116,42 +116,44 @@ class FrameReport(ttk.Frame):
                      anchor='center')
         s.configure('TFrame', background='black')
 
+        sticky: tuple = ('n', 'e', 's', 'w',)
+
         # LABELS FOR REPORTS
         label_actions = ttk.Label(self,
                                   text=f'Total investido em Ações: R$ {self.report_actions()}',
                                   style='L.TLabel',
                                   )
-        label_actions.grid(row=0, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
+        label_actions.grid(row=0, column=0, padx=5, pady=5, sticky=sticky)
 
         label_fii = ttk.Label(self,
                               text=f'Total investido em FIIs: R$ {self.report_fiis()}',
                               style='L.TLabel',
                               )
-        label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
+        label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=sticky)
 
         label_direct_treasure = ttk.Label(self,
                                           text=f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}',
                                           style='L.TLabel',
                                           )
-        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
+        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5, sticky=sticky)
 
         label_fixed_income = ttk.Label(self,
                                        text=f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}',
                                        style='L.TLabel',
                                        )
-        label_fixed_income.grid(row=3, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
+        label_fixed_income.grid(row=3, column=0, padx=5, pady=5, sticky=sticky)
 
         label_emergency_reserve = ttk.Label(self,
                                             text=f'Total na Reserva de Emergência: R${self.report_emergency_reserv()}',
                                             style='L.TLabel',
                                             )
-        label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5, sticky=('n', 'e', 's', 'w',))
+        label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5, sticky=sticky)
 
         label_total_invest = ttk.Label(self,
                                        text=f'Total investido: R$ {self.report_total_invested()}',
                                        style='T.TLabel',
                                        )
-        label_total_invest.grid(row=5, column=0, sticky=('n', 'e', 's', 'w',))
+        label_total_invest.grid(row=5, column=0, sticky=sticky)
 
         # ADAPTATIVE
         self.columnconfigure(0, weight=3)
