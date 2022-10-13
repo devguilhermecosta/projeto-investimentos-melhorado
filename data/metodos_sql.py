@@ -13,12 +13,12 @@ try:
 except Exception as error:
     print(f'{error}')
 
-import sqlite3 as sq
 from ativos.fiis import Fiis
 from ativos.acoes import Acao
 from ativos.renda_fixa import RendaFixa
 from ativos.tesouro_direto import TesouroDireto
 from ativos.reserva_emergencia import ReservaEmergencia
+import sqlite3 as sq
 
 
 class MetodosSqlRV:
@@ -26,32 +26,32 @@ class MetodosSqlRV:
         self._conn = sq.connect('data/data.db')
         self._cursor = self._conn.cursor()
         
-    def _existe_ativo(self, codigo: str) -> bool:
+    def _existe_ativo(self, id: str) -> bool:
         """
         Param: codigo: str
         return: bool
         """
         resultado: bool = False
-        self.__sub_acao_sql_select_all_com_codigo(codigo)
+        self.__sub_acao_sql_select_all_com_id(id)
         for i in self._cursor.fetchall():
-            if i[2] == codigo:
+            if i[2] == id:
                 resultado = True
         return resultado
 
-    def _get_id_rv(self, codigo: str) -> int:
+    def _get_id_rv(self, id: str) -> int:
         """
         Param: codigo: str
         return: int
         """
         resultado: int = -1
-        if self._existe_ativo(codigo):
-            self.__sub_acao_sql_select_all_com_codigo(codigo)
+        if self._existe_ativo(id):
+            self.__sub_acao_sql_select_all_com_id(id)
             for i in self._cursor.fetchall():
-                if i[2] == codigo:
+                if i[2] == id:
                     resultado = i[0]
         return resultado
 
-    def _quantidade_suficiente(self, ativo: Acao | Fiis) -> bool:
+    def _quantidade_suficiente(self, id: str) -> bool:
         """
         Param: ativo: Object -> Acao | Fiis
         Param: nome: str
@@ -60,8 +60,8 @@ class MetodosSqlRV:
         return bool
         """
         resultado: bool = False
-        if self._existe_ativo(ativo.codigo):
-            self.__sub_acao_sql_select_all_com_id(ativo)
+        if self._existe_ativo(id):
+            self.__sub_acao_sql_select_all_com_id(id)
             for at in self._cursor.fetchall():
                 quantidade_disponivel: int = at[4]
                 
@@ -103,8 +103,8 @@ class MetodosSqlRV:
             self._cursor.execute(acao_2, (nova_qtde, novo_pu, novo_pm, novo_pt, id))
             self._conn.commit()
 
-    def acao_sql_vender(self, ativo: Acao | Fiis, qtde: int, pu: float) -> None:
-        self.__sub_acao_sql_select_all_com_id(ativo)
+    def acao_sql_vender(self, id: str, qtde: int, pu: float) -> None:
+        self.__sub_acao_sql_select_all_com_id(id)
         
         for at in self._cursor.fetchall():
             qtde_atual: int = at[4]
@@ -119,13 +119,12 @@ class MetodosSqlRV:
             novo_pt: float = novo_pm * nova_qtde
             
             acao_2 = "UPDATE RV SET quantidade=?, PU=?, PM=?, PT=? WHERE id=?"
-            self._cursor.execute(acao_2, (nova_qtde, novo_pu, novo_pm, novo_pt, at[0]))
+            self._cursor.execute(acao_2, (nova_qtde, novo_pu, novo_pm, novo_pt, id))
             self._conn.commit()
 
-    def acao_sql_deletar_ativo(self, ativo: Acao | Fiis) -> None:
-        ident = self._get_id_rv(ativo.codigo)
+    def acao_sql_deletar_ativo(self, id: str) -> None:
         acao = "DELETE FROM RV WHERE id=?"
-        self._cursor.execute(acao, (ident,))
+        self._cursor.execute(acao, (id,))
         self._conn.commit()
 
     def acao_sql_alterar_dados(self, ativo: Acao | Fiis, nome: str, codigo: str) -> None:
@@ -154,11 +153,7 @@ class MetodosSqlRV:
     def __sub_acao_sql_select_all_com_id(self, id: str) -> None:
         acao = "SELECT * FROM RV WHERE id=?"
         self._cursor.execute(acao, (id,))
-        
-    def __sub_acao_sql_select_all_com_codigo(self, codigo: str) -> None:
-        acao: str = 'SELECT * FROM RV WHERE codigo=?'
-        self._cursor.execute(acao, (codigo,))
-
+    
     def sair(self) -> None:
         self._conn.close()
 

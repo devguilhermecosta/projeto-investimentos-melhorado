@@ -12,9 +12,8 @@ try:
     )
 except Exception as error:
     print(f'{error}')
-    
 
-import sqlite3 as sq
+
 from .exceptions import AtivoJaCadastradoError, AtivoNaoCadastradoError, SaldoInsuficienteError
 from .exceptions import QuantidadeInsuficienteError
 from .metodos_sql import MetodosSqlRF, MetodosSqlRV
@@ -23,6 +22,7 @@ from ativos.acoes import Acao
 from ativos.renda_fixa import RendaFixa
 from ativos.tesouro_direto import TesouroDireto
 from ativos.reserva_emergencia import ReservaEmergencia
+import sqlite3 as sq
 
 
 class RepositorioRendaVariavel(MetodosSqlRV):
@@ -55,37 +55,32 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         except Exception as error:
             print(error)
             
-    def vender(self, ativo: Acao | Fiis, qtde: int, pu: float) -> int | None:
+    def vender(self, id: str, qtde: int, pu: float) -> None:
         """
-        Param: ativo: Object -> Acao | Fiis
+        Param: id: str
         Param: qtde: int
         Param: pu: float
         
-        Raise: AtivoNaoCadastradoError, QuantidadeInsuficienteError
+        Raise: QuantidadeInsuficienteError
         
-        return 0 or None
+        return None
         """
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        elif not self._quantidade_suficiente(ativo):
-            raise QuantidadeInsuficienteError('Quantidade insuficiente para venda') 
-        else:
-            self.acao_sql_vender(ativo, qtde, pu)
-            return 0
+        try:
+            self.acao_sql_vender(id, qtde, pu)
+        except QuantidadeInsuficienteError:
+            raise QuantidadeInsuficienteError('Quantidade insuficiente para venda')
       
-    def deletar(self, ativo: Acao | Fiis) -> int:
+    def deletar(self, id: str) -> int:
         """
-        Param: ativo: Object -> Acao | Fiis
-        
-        Raise: AtivoNaoCadastradoError
+        Param: id: str
         
         return 0 or None
         """
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_deletar_ativo(ativo)
+        try:
+            self.acao_sql_deletar_ativo(id)
             return 0
+        except Exception as error:
+            print(error)
 
     def alterar_dados(self, ativo: Acao | Fiis, nome: str, codigo: str) -> int | None:
         """       
