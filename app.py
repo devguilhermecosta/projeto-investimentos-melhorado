@@ -1,5 +1,5 @@
 from time import sleep
-from tkinter import Toplevel, ttk
+from tkinter import StringVar, Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
 from ativo_factory import AtivoFactory
@@ -74,34 +74,13 @@ class ButtonMenu(ttk.Frame):
 
         button_sell = ttk.Button(self,
                                 text='RENDA VARIÁVEL',
-                                command=None,
+                                command=lambda: ListProductsRV(master),
                                 )
         button_sell.grid(row=2, column=0, padx=10, pady=10, sticky=sticky)
-
-        button_m_value = ttk.Button(self,
-                                    text='ACERTAR VALOR',
-                                    command=None,
-                                    )
-        button_m_value.grid(row=3, column=0, padx=10, pady=10, sticky=sticky)
-
-        button_m_amount = ttk.Button(self,
-                                    text='ACERTAR QTDE',
-                                    command=None,
-                                    )
-        button_m_amount.grid(row=4, column=0, padx=10, pady=10, sticky=sticky)
-
-        button_delete = ttk.Button(self,
-                                    text='EXCLUIR',
-                                    command=None,
-                                    )
-        button_delete.grid(row=5, column=0, padx=10, pady=10, sticky=sticky)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
-        self.rowconfigure(3, weight=1)
-        self.rowconfigure(4, weight=1)
-        self.rowconfigure(5, weight=1)
 
 
 class FrameReport(ttk.Frame):
@@ -751,10 +730,11 @@ class ListProductsRF(Toplevel):
                                              )
         self.button_change_data.grid(row=0, column=3, pady=(5, 10), padx=10)
 
+    # FUNCTIONS
     def list_items(self):
         for data in self.rep_rf.relatorio_for_tkinter():
             self.tree.insert('', 'end', values=data)
-    
+
     def item_selected(self, *args):
         self.button_purchase['state'] = 'enable'
         self.button_del['state'] = 'enable'
@@ -1046,15 +1026,15 @@ class ListProductsRF(Toplevel):
                 
         try:
             if not amount or not value or amount =='' or value == '':
-                showerror(message="Verifique a quantidade e valor informados")
+                showerror(title='Error', message="Verifique a quantidade e valor informados")
                 return
             else:
                 self.rep_rf.comprar(code, int(amount), float(value))
-                showinfo(message=f'Compra realizada com sucesso')
+                showinfo(title='Ok', message=f'Compra realizada com sucesso')
                 self.refresh()
                 self.top_l.destroy()
         except ValueError:
-            showerror(message='Entrada de dados inválida')
+            showerror(title='Error', message='Entrada de dados inválida')
         except Exception as error:
             showerror(message=f'Error: {error}')
     
@@ -1127,6 +1107,221 @@ class ListProductsRF(Toplevel):
         for record in self.tree.get_children():
             self.tree.delete(record)
         
+        self.list_items()
+
+
+class ListProductsRV(Toplevel):
+    
+    def __init__(self, master):
+        Toplevel.__init__(self, master)
+        self.title('Ativos')
+        self.configure(background='#000000')
+        GeneralFunctions.set_size_window(self, 1200, 600)
+
+        # VARIABLES
+        self.rep_rv = RepositorioRendaVariavel()
+
+        # STYLES
+        self.s = ttk.Style()
+        self.s.configure('TFrame',
+                         background='#000000',
+                         )
+        self.s.configure('TLabel',
+                         background='#000000',
+                         font='arial 16')
+        self.s.configure('Treeview',
+                         font='arial 14',
+                         )
+        self.s.configure('Heading',
+                         font='arial 14',
+                         foreground='white',
+                         background='black',
+                         )
+        self.s.configure('AT.TFrame',
+                         background='#000000',
+                         )
+        
+        # COLUMNS OF TREEVIEW
+        columns = ('id',
+                   'nome',
+                   'codigo',
+                   'categoria',
+                   'quantidade',
+                   'pu',
+                   'pm',
+                   'pt',
+                   )
+        
+        # TREEVIEW
+        self.tree = ttk.Treeview(self, columns=columns, show='headings', height=25)
+
+        self.tree.heading('id', text='ID')
+        self.tree.heading('nome', text='NOME')
+        self.tree.heading('codigo', text='CODIGO')
+        self.tree.heading('categoria', text='CATEGORIA')
+        self.tree.heading('quantidade', text='QUANTIDADE')
+        self.tree.heading('pu', text='PREÇO UNITÁRIO')
+        self.tree.heading('pm', text='PREÇO MÉDIO')
+        self.tree.heading('pt', text='PREÇO TOTAL')
+
+        self.tree.column(column=0, width=30, anchor='center', stretch=True)
+        self.tree.column(column=1, anchor='center', stretch=True)
+        self.tree.column(column=2, width=130, anchor='center', stretch=True)
+        self.tree.column(column=3, width=140, anchor='center', stretch=True)
+        self.tree.column(column=4, width=140, anchor='center', stretch=True)
+        self.tree.column(column=5, anchor='center', stretch=True)
+        self.tree.column(column=6, width=140, anchor='center', stretch=True)
+        self.tree.column(column=7, anchor='center', stretch=True)
+
+        # INSERT ITENS INTO TREEVIEW
+        self.list_items()
+
+        self.tree.grid(row=0, column=0, sticky=('n', 's', 'e', 'w'))
+        self.tree.bind('<<TreeviewSelect>>', self.item_selected)
+        
+        # SCROLLBAR
+        scroll = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scroll.set)
+        scroll.grid(row=0, column=1, sticky=('n', 's'))
+
+        # FRAME FOR BUTTONS
+        frame = ttk.Frame(self, style='AT.TFrame')
+        frame.grid(row=1, column=0, columnspan=2)
+
+        # BUTTONS
+        self.button_purchase = ttk.Button(frame,
+                                     text='Comprar',
+                                     state='disabled',
+                                     width=8,
+                                     command=self.top_level_purchase,
+                                     )
+        self.button_purchase.grid(row=0, column=0, pady=(5, 10), padx=10)
+    
+    # FUNCTIONS
+    def list_items(self):
+        for data in self.rep_rv.relatorio_for_tkinter():
+            self.tree.insert('', 'end', values=data)
+
+    def item_selected(self, *args):
+        self.button_purchase['state'] = 'enable'
+
+        for selected_item in self.tree.selection():
+            item: list = self.tree.item(selected_item)['values']
+            return item
+
+    def top_level_purchase(self):
+        self.top_l = Toplevel(self)
+        self.top_l.title('Comprar ativo')
+        self.top_l.configure(background='#000000')
+        GeneralFunctions.set_size_window(self.top_l, 400, 280)
+
+        # PRODUCT
+        self.item: list = self.item_selected()      
+        
+        # FRAME
+        frame = ttk.Frame(self.top_l)
+        frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # FRAME_2
+        frame_2 = ttk.Frame(self.top_l)
+        frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # LABEL AND ENTRY FOR DATA
+        label_id = ttk.Label(frame,
+                             text='ID:',
+                             )
+        label_id.grid(row=0, column=0)
+        
+        entry_id = ttk.Entry(frame,
+                             font='arial 16',
+                             )
+        entry_id.insert('end', self.item[0])
+        entry_id.grid(row=0, column=1)
+        
+        label_name = ttk.Label(frame,
+                               text='Nome:',
+                               )
+        label_name.grid(row=1, column=0)
+        
+        entry_name = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        entry_name.insert('end', self.item[1])
+        entry_name.grid(row=1, column=1)
+
+        label_code = ttk.Label(frame,
+                               text='Código:',
+                               )
+        label_code.grid(row=2, column=0)
+
+        entry_code = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        entry_code.grid(row=2, column=1)
+        entry_code.insert('end', self.item[2])
+        
+        # LABEL AND ENTRY FOR PURCHASE        
+        label_amount = ttk.Label(frame_2,
+                                 text='Quantidade:',
+                                 )
+        label_amount.grid(row=0, column=0)
+        
+        self.amount_entry = ttk.Entry(frame_2,
+                                 font='arial 16',
+                                 width=6,
+                                 )
+        self.amount_entry.grid(row=0, column=1)
+        
+        label_value = ttk.Label(frame_2,
+                                text='Valor Unitário:',
+                                )
+        label_value.grid(row=1, column=0)
+        
+        self.value_entry = ttk.Entry(frame_2,
+                                font='arial 16',
+                                width=6,
+                                )
+        self.value_entry.grid(row=1, column=1)
+
+        # BUTTON FOR PURCHASE        
+        button_purchase = ttk.Button(frame_2,
+                                     text='Confirmar',
+                                     width=10,
+                                     command=self.purchase,
+                                     )
+        button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
+    
+    def purchase(self):
+        code: str = self.item[0]
+        label: str = self.item[2]
+        amount: int = self.amount_entry.get()
+        value: str = self.value_entry.get().replace(',', '.')
+
+        try:
+            if not amount or not value or amount == '' or value == '':
+                showerror(title='Error', message="Verifique a quantidade e valor informados")
+                return
+            else:
+                self.rep_rv.comprar(code, int(amount), float(value))
+                showinfo(title='Ok',
+                        message=f'Compra de {amount} unidade(s) de {label} no total \n'
+                                f'de R$ {self.total_value()} realizada com sucesso.')
+                self.top_l.destroy()
+                self.refresh()
+        except Exception as error:
+            showerror(title='Error', message=error)
+    
+    def total_value(self) -> str:
+        value: str = self.value_entry.get().replace(',', '.')
+        amount: str = self.amount_entry.get()
+        total: float = float(value) * int(amount)
+
+        return f'{total:.2f}'
+    
+    def refresh(self):
+        for record in self.tree.get_children():
+            self.tree.delete(record)
+
         self.list_items()
 
 

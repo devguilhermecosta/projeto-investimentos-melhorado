@@ -84,8 +84,8 @@ class MetodosSqlRV:
                                  )
         self._conn.commit()
 
-    def acao_aql_comprar_ativo(self, ativo: Fiis | Acao, qtde: int, pu: float) -> None:
-        self.__sub_acao_sql_select_all_com_id(ativo)
+    def acao_aql_comprar_ativo(self, id: str, qtde: int, pu: float) -> None:
+        self.__sub_acao_sql_select_all_com_id(id)
 
         for at in self._cursor.fetchall():
             qtde_atual: int = at[4]
@@ -100,7 +100,7 @@ class MetodosSqlRV:
             novo_pt: float = novo_pm * nova_qtde
             
             acao_2 = "UPDATE RV SET quantidade=?, PU=?, PM=?, PT=? WHERE id=?"
-            self._cursor.execute(acao_2, (nova_qtde, novo_pu, novo_pm, novo_pt, at[0]))
+            self._cursor.execute(acao_2, (nova_qtde, novo_pu, novo_pm, novo_pt, id))
             self._conn.commit()
 
     def acao_sql_vender(self, ativo: Acao | Fiis, qtde: int, pu: float) -> None:
@@ -151,10 +151,9 @@ class MetodosSqlRV:
         self._cursor.execute(acao)
         tot = 0
 
-    def __sub_acao_sql_select_all_com_id(self, ativo: Acao | Fiis) -> None:
-        ident: int = self._get_id_rv(ativo.codigo)
+    def __sub_acao_sql_select_all_com_id(self, id: str) -> None:
         acao = "SELECT * FROM RV WHERE id=?"
-        self._cursor.execute(acao, (ident,))
+        self._cursor.execute(acao, (id,))
         
     def __sub_acao_sql_select_all_com_codigo(self, codigo: str) -> None:
         acao: str = 'SELECT * FROM RV WHERE codigo=?'

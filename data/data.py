@@ -40,7 +40,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
             self.acao_sql_cadastrar_ativo(ativo)
             return 0
     
-    def comprar(self, ativo: Fiis | Acao, qtde: int, pu: float) -> int | None:
+    def comprar(self, id: str, qtde: int, pu: float) -> int | None:
         """
         Param: ativo: Object -> Acao | Fiis
         Param: qtde: int
@@ -50,11 +50,10 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         
         return 0 or None
         """      
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_aql_comprar_ativo(ativo, qtde, pu)
-            return 0        
+        try:
+            self.acao_aql_comprar_ativo(id, qtde, pu)
+        except Exception as error:
+            print(error)
             
     def vender(self, ativo: Acao | Fiis, qtde: int, pu: float) -> int | None:
         """
@@ -155,6 +154,16 @@ class RepositorioRendaVariavel(MetodosSqlRV):
                 tot += float(item[7])
 
         return tot
+
+    def relatorio_for_tkinter(self) -> list:
+        acao: str = "SELECT * FROM RV"
+        self._cursor.execute(acao)
+        rep: list = []
+
+        for i in self._cursor.fetchall():
+            res: list = [i[0], i[1], i[2], i[3], i[4], f'R$ {i[5]:.2f}', f'R$ {i[6]:.2f}', f'R$ {i[7]:.2f}']
+            rep.append(res)
+        return rep
 
 
 class RepositorioRendaFixa(MetodosSqlRF):      
@@ -306,6 +315,6 @@ class RepositorioRendaFixa(MetodosSqlRF):
         rep: list = []
 
         for i in self._cursor.fetchall():
-            res: list = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]]
+            res: list = [i[0], i[1], i[2], i[3], i[4], f'R$ {i[5]:.2f}', i[6], i[7]]
             rep.append(res)
         return rep
