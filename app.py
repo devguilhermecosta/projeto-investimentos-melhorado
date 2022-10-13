@@ -143,32 +143,32 @@ class FrameReport(ttk.Frame):
         self.rowconfigure(4, weight=1)
         self.rowconfigure(5, weight=1)
     
-    def report_actions(self):
+    def report_actions(self) -> str:
         rep = RepositorioRendaVariavel()
         tot = rep.relatorio_acoes()
         return f'{tot:.2f}'
 
-    def report_fiis(self):
+    def report_fiis(self) -> str:
         rep = RepositorioRendaVariavel()
         tot = rep.relatorio_fiis()
         return f'{tot:.2f}'
 
-    def report_emergency_reserv(self):
+    def report_emergency_reserv(self) -> str:
         rep = RepositorioRendaFixa()
         tot = rep.relatorio_res_emerg()
         return f'{tot:.2f}'
     
-    def report_direct_treasure(self):
+    def report_direct_treasure(self) -> str:
         rep = RepositorioRendaFixa()
         tot = rep.relatorio_tesouro_direto()
         return f'{tot:.2f}'
 
-    def report_fixed_income(self):
+    def report_fixed_income(self) -> str:
         rep = RepositorioRendaFixa()
         tot = rep.relatorio_renda_fixa()
         return f'{tot:.2f}'
     
-    def report_total_invested(self):
+    def report_total_invested(self) -> str:
         rv = RepositorioRendaVariavel()
         rf = RepositorioRendaFixa()
 
@@ -205,7 +205,7 @@ class TopLevelRegister:
         button_variable_income.place(x=40, y=190)
     
     # FUNCTIONS
-    def open_toplevel_variable_income(self, master):
+    def open_toplevel_variable_income(self, master) -> None:
         self.top_level.destroy()
         sleep(1)
         TLRegVariableIncome(master,
@@ -214,7 +214,7 @@ class TopLevelRegister:
                             580,
                             400,)
     
-    def open_toplevel_fixed_income(self, master):
+    def open_toplevel_fixed_income(self, master) -> None:
         self.top_level.destroy()
         sleep(1)
         TLRegFixedleIncome(master,
@@ -318,15 +318,15 @@ class TLRegVariableIncome(Toplevel):
                                    )
         button_cancel.grid(row=1, column=0, pady=10)
     
-    def validate_action(self):
+    def validate_action(self) -> None:
         self.check_action = True
         self.check_fii = False
 
-    def validate_fii(self):
+    def validate_fii(self) -> None:
         self.check_action = False
         self.check_fii = True
 
-    def register(self):
+    def register(self) -> None:
         if self.check_action:
             
             def check_data(data: tuple, step: int):
@@ -377,7 +377,7 @@ class TLRegVariableIncome(Toplevel):
         if not self.check_action and not self.check_fii:
             showerror(message='Preencha todos os dados')
         
-    def quit(self):
+    def quit(self) -> None:
         self.destroy()
 
 
@@ -518,7 +518,7 @@ class TLRegFixedleIncome(Toplevel):
         self.button_register.grid(row=1, column=0)
     
     # FUNCTIONS    
-    def select_option(self): 
+    def select_option(self) -> None: 
         
         self.state = self.options.get()
         
@@ -547,7 +547,7 @@ class TLRegFixedleIncome(Toplevel):
             self.entry_payment['state'] = 'disabled'
             self.button_register['state'] = 'disabled'
     
-    def register(self):
+    def register(self) -> None:
         self.rep_rf = AtivoFactory()
         
         name = self.entry_name.get().upper()
@@ -610,7 +610,7 @@ class TLRegFixedleIncome(Toplevel):
         except AtivoJaCadastradoError:
             showerror(message='Ativo já cadastrado na base de dados.')
     
-    def check_one(self, list):
+    def check_one(self, list) -> bool:
         amount: int = int(len(list))
         res_cont: int = int(sum([(1) for i in list if len(i) != 0]))
         if res_cont < amount:
@@ -731,11 +731,11 @@ class ListProductsRF(Toplevel):
         self.button_change_data.grid(row=0, column=3, pady=(5, 10), padx=10)
 
     # FUNCTIONS
-    def list_items(self):
+    def list_items(self) -> None:
         for data in self.rep_rf.relatorio_for_tkinter():
             self.tree.insert('', 'end', values=data)
 
-    def item_selected(self, *args):
+    def item_selected(self, *args) -> list:
         self.button_purchase['state'] = 'enable'
         self.button_del['state'] = 'enable'
         self.button_change_data['state'] = 'enable'
@@ -745,7 +745,7 @@ class ListProductsRF(Toplevel):
             item: list = self.tree.item(selected_item)['values']
             return item
             
-    def top_level_purchase(self):
+    def top_level_purchase(self) -> None:
         self.top_l = Toplevel(self)
         self.top_l.title('Comprar ativo')
         self.top_l.configure(background='#000000')
@@ -816,7 +816,7 @@ class ListProductsRF(Toplevel):
                                      )
         button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
     
-    def top_level_set_data(self):
+    def top_level_set_data(self) -> None:
         self.top_level_rdm = Toplevel(self)
         self.top_level_rdm.title('Alterar dados cadastrais')
         self.top_level_rdm.configure(background='#000000')
@@ -897,7 +897,7 @@ class ListProductsRF(Toplevel):
                                      )
         button_purchase.grid(row=2, column=0, columnspan=2, pady=(5, 0))
     
-    def top_level_del(self):
+    def top_level_del(self) -> None:
         self.top_level_del = Toplevel(self)
         self.top_level_del.title('Deletar ativo')
         self.top_level_del.configure(background='#000000')
@@ -945,7 +945,7 @@ class ListProductsRF(Toplevel):
                                      )
         button_sell.grid(row=2, column=0, columnspan=2, pady=(20, 0))
     
-    def top_level_amount_value(self):
+    def top_level_amount_value(self) -> None:
         self.top_level_change = Toplevel(self)
         self.top_level_change.title('Acertar valores')
         self.top_level_change.configure(background='#000000')
@@ -1019,7 +1019,7 @@ class ListProductsRF(Toplevel):
                                      )
         button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         
-    def purchase(self):
+    def purchase(self) -> None:
         amount = self.amount_entry.get()
         value = self.value_entry.get().replace(',', '.')
         code: str = str(self.item[0])
@@ -1038,7 +1038,7 @@ class ListProductsRF(Toplevel):
         except Exception as error:
             showerror(message=f'Error: {error}')
     
-    def sell(self):
+    def sell(self) -> None:
         code: str = str(self.item[1])
         try:
             self.rep_rf.deletar_ativo(code)
@@ -1048,7 +1048,7 @@ class ListProductsRF(Toplevel):
         except Exception as error:
             showerror(message=f'Error: {error}')
     
-    def change_value_amount(self):
+    def change_value_amount(self) -> None:
         code: str = str(self.item[0])
         amount = self.amount_entry.get()
         value = self.value_entry.get().replace(',', '.')
@@ -1067,12 +1067,12 @@ class ListProductsRF(Toplevel):
         except Exception as error:
             showerror(message=f'Error: {error}')
 
-    def get_category(self, event):
+    def get_category(self, event) -> str:
         self.entry_category.select_clear()
-        item = self.entry_category.get()
+        item: str = self.entry_category.get()
         return item
 
-    def set_data(self):
+    def set_data(self) -> None:
         code: str = str(self.item[0])
         name: str = self.entry_name.get().title()
         category: str = self.entry_category.get()
@@ -1103,7 +1103,7 @@ class ListProductsRF(Toplevel):
                       f'{error}'
                       )
     
-    def refresh(self):
+    def refresh(self) -> None:
         for record in self.tree.get_children():
             self.tree.delete(record)
         
@@ -1198,18 +1198,18 @@ class ListProductsRV(Toplevel):
         self.button_purchase.grid(row=0, column=0, pady=(5, 10), padx=10)
     
     # FUNCTIONS
-    def list_items(self):
+    def list_items(self) -> None:
         for data in self.rep_rv.relatorio_for_tkinter():
             self.tree.insert('', 'end', values=data)
 
-    def item_selected(self, *args):
+    def item_selected(self, *args) -> list:
         self.button_purchase['state'] = 'enable'
 
         for selected_item in self.tree.selection():
             item: list = self.tree.item(selected_item)['values']
             return item
 
-    def top_level_purchase(self):
+    def top_level_purchase(self) -> None:
         self.top_l = Toplevel(self)
         self.top_l.title('Comprar ativo')
         self.top_l.configure(background='#000000')
@@ -1291,7 +1291,7 @@ class ListProductsRV(Toplevel):
                                      )
         button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
     
-    def purchase(self):
+    def purchase(self) -> None:
         code: str = self.item[0]
         label: str = self.item[2]
         amount: int = self.amount_entry.get()
@@ -1318,7 +1318,7 @@ class ListProductsRV(Toplevel):
 
         return f'{total:.2f}'
     
-    def refresh(self):
+    def refresh(self) -> None:
         for record in self.tree.get_children():
             self.tree.delete(record)
 
@@ -1327,7 +1327,7 @@ class ListProductsRV(Toplevel):
 
 class GeneralFunctions:
     @staticmethod
-    def set_size_window(window, width, height):
+    def set_size_window(window: str, width: str, height: str) -> None:
         w = int((window.winfo_screenwidth() / 2) - (width/2))
         h = int((window.winfo_screenheight() / 2) - (height/2))
         window.geometry(f'{width}x{height}+{w}+{h}')
