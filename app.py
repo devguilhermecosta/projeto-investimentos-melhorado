@@ -1,10 +1,15 @@
+from lib2to3.pytree import type_repr
+from shutil import ExecError
+from sqlite3 import IntegrityError
 from time import sleep
 from tkinter import StringVar, Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
+
 from ttkthemes import ThemedTk
+
 from ativo_factory import AtivoFactory
 from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
-from data.exceptions import AtivoJaCadastradoError, FaltamDadosErros
+from data.exceptions import AtivoJaCadastradoError
 
 
 class PyInvest:
@@ -659,6 +664,15 @@ class ListProductsRF(Toplevel):
         self.s.configure('AT.TFrame',
                          background='#000000',
                          )
+        self.s.configure('R.TButton')
+        self.s.map('R.TButton',
+                   background=[('disabled', '#ccc'),
+                               ('!active', '#D20000'),
+                               ('pressed', '#D12200'),
+                               ('active', '#E01612'),
+                               ],
+                   foreground=[('pressed', '#575757')],
+                   )
         
         # COLUMNS OF TREEVIEW
         columns = ('id',
@@ -720,6 +734,7 @@ class ListProductsRF(Toplevel):
         self.button_del = ttk.Button(frame,
                                       text='Deletar',
                                       state='disabled',
+                                      style='R.TButton',
                                       width=8,
                                       takefocus=0,
                                       command=self.top_level_del,
@@ -1026,7 +1041,8 @@ class ListProductsRF(Toplevel):
                                        width=12,
                                        )
         self.value_entry.grid(row=1, column=1)
-        self.value_entry.insert('end', self.item[5])
+        formatted_value: str = str(self.item[5]).replace('R$', '').split()
+        self.value_entry.insert('end', formatted_value)
         
         # BUTTON FOR CHANGE DATA  
         button_purchase = ttk.Button(frame_2,
@@ -1110,10 +1126,9 @@ class ListProductsRF(Toplevel):
                                                 expiration,
                                                 profitability,
                                                 )
-                self.refresh()
                 showinfo(title='OK', message='Dados alterados com sucesso')
-        except AtivoJaCadastradoError:
-            showerror(title='Error', message='Este ativo já existe na base de dados.')
+                self.refresh()
+                self.top_level_rdm.destroy()
         except ValueError:
             showerror(title='Error', message='Verifique os dados informados.')
         except Exception as error:
@@ -1138,6 +1153,7 @@ class ListProductsRV(Toplevel):
 
         # VARIABLES
         self.rep_rv = RepositorioRendaVariavel()
+        self.check: bool = False
 
         # STYLES
         self.s = ttk.Style()
@@ -1158,6 +1174,14 @@ class ListProductsRV(Toplevel):
         self.s.configure('AT.TFrame',
                          background='#000000',
                          )
+        self.s.map('R.TButton',
+                   background=[('disabled', '#ccc'),
+                               ('!active', '#D20000'),
+                               ('pressed', '#D12200'),
+                               ('active', '#E01612'),
+                               ],
+                   foreground=[('pressed', '#575757')],
+                   )
         
         # COLUMNS OF TREEVIEW
         columns = ('id',
@@ -1228,9 +1252,10 @@ class ListProductsRV(Toplevel):
         self.button_dell = ttk.Button(frame,
                                      text='Deletar',
                                      state='disabled',
+                                     style='R.TButton',
                                      width=8,
                                      takefocus=0,
-                                     command=self.top_level_del,
+                                     command=self.top_level_delelete,
                                      )
         self.button_dell.grid(row=0, column=2, pady=(5, 10), padx=10)
 
@@ -1239,9 +1264,18 @@ class ListProductsRV(Toplevel):
                                              state='disabled',
                                              width=8,
                                              takefocus=0,
-                                             command=None,
+                                             command=self.top_level_set_data,
                                              )
         self.button_change_data.grid(row=0, column=3, pady=(5, 10), padx=10)
+
+        self.button_set_value_amount = ttk.Button(frame,
+                                             text='Acertar valores',
+                                             state='disabled',
+                                             width=12,
+                                             takefocus=0,
+                                             command=self.top_level_amount_value,
+                                             )
+        self.button_set_value_amount.grid(row=0, column=4, pady=(5, 10), padx=10)
     
     # FUNCTIONS
     def list_items(self) -> None:
@@ -1253,93 +1287,105 @@ class ListProductsRV(Toplevel):
         self.button_sell['state'] = 'enable'
         self.button_dell['state'] = 'enable'
         self.button_change_data['state'] = 'enable'
+        self.button_set_value_amount['state'] = 'enable'
 
         for selected_item in self.tree.selection():
             item: list = self.tree.item(selected_item)['values']
             return item
+    
+    def pos_action(self) -> None:
+        self.button_purchase['state'] = 'disabled'
+        self.button_sell['state'] = 'disabled'
+        self.button_dell['state'] = 'disabled'
+        self.button_change_data['state'] = 'disabled'
+        self.button_set_value_amount['state'] = 'disabled'
 
     def top_level_purchase(self) -> None:
-        self.top_l = Toplevel(self)
-        self.top_l.title('Comprar ativo')
-        self.top_l.configure(background='#000000')
-        GeneralFunctions.set_size_window(self.top_l, 400, 280)
+        try:
+            self.top_l = Toplevel(self)
+            self.top_l.title('Comprar ativo')
+            self.top_l.configure(background='#000000')
+            GeneralFunctions.set_size_window(self.top_l, 400, 280)
 
-        # PRODUCT
-        self.item: list = self.item_selected()      
-        
-        # FRAME
-        frame = ttk.Frame(self.top_l)
-        frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
-        
-        # FRAME_2
-        frame_2 = ttk.Frame(self.top_l)
-        frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
-        
-        # LABEL AND ENTRY FOR DATA
-        label_id = ttk.Label(frame,
-                             text='ID:',
-                             )
-        label_id.grid(row=0, column=0)
-        
-        entry_id = ttk.Entry(frame,
-                             font='arial 16',
-                             )
-        entry_id.insert('end', self.item[0])
-        entry_id.grid(row=0, column=1)
-        
-        label_name = ttk.Label(frame,
-                               text='Nome:',
-                               )
-        label_name.grid(row=1, column=0)
-        
-        entry_name = ttk.Entry(frame,
-                               font='arial 16',
-                               )
-        entry_name.insert('end', self.item[1])
-        entry_name.grid(row=1, column=1)
-
-        label_code = ttk.Label(frame,
-                               text='Código:',
-                               )
-        label_code.grid(row=2, column=0)
-
-        entry_code = ttk.Entry(frame,
-                               font='arial 16',
-                               )
-        entry_code.grid(row=2, column=1)
-        entry_code.insert('end', self.item[2])
-        
-        # LABEL AND ENTRY FOR PURCHASE        
-        label_amount = ttk.Label(frame_2,
-                                 text='Quantidade:',
-                                 )
-        label_amount.grid(row=0, column=0)
-        
-        self.amount_entry = ttk.Entry(frame_2,
-                                 font='arial 16',
-                                 width=6,
-                                 )
-        self.amount_entry.grid(row=0, column=1)
-        
-        label_value = ttk.Label(frame_2,
-                                text='Valor Unitário:',
+            # PRODUCT
+            self.item: list = self.item_selected()      
+            
+            # FRAME
+            frame = ttk.Frame(self.top_l)
+            frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
+            
+            # FRAME_2
+            frame_2 = ttk.Frame(self.top_l)
+            frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
+            
+            # LABEL AND ENTRY FOR DATA
+            label_id = ttk.Label(frame,
+                                text='ID:',
                                 )
-        label_value.grid(row=1, column=0)
-        
-        self.value_entry = ttk.Entry(frame_2,
+            label_id.grid(row=0, column=0)
+            
+            entry_id = ttk.Entry(frame,
                                 font='arial 16',
-                                width=6,
                                 )
-        self.value_entry.grid(row=1, column=1)
+            entry_id.insert('end', self.item[0])
+            entry_id.grid(row=0, column=1)
+            
+            label_name = ttk.Label(frame,
+                                text='Nome:',
+                                )
+            label_name.grid(row=1, column=0)
+            
+            entry_name = ttk.Entry(frame,
+                                font='arial 16',
+                                )
+            entry_name.insert('end', self.item[1])
+            entry_name.grid(row=1, column=1)
 
-        # BUTTON FOR PURCHASE        
-        button_purchase = ttk.Button(frame_2,
-                                     text='Confirmar',
-                                     width=10,
-                                     takefocus=0,
-                                     command=self.purchase,
-                                     )
-        button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
+            label_code = ttk.Label(frame,
+                                text='Código:',
+                                )
+            label_code.grid(row=2, column=0)
+
+            entry_code = ttk.Entry(frame,
+                                font='arial 16',
+                                )
+            entry_code.grid(row=2, column=1)
+            entry_code.insert('end', self.item[2])
+            
+            # LABEL AND ENTRY FOR PURCHASE        
+            label_amount = ttk.Label(frame_2,
+                                    text='Quantidade:',
+                                    )
+            label_amount.grid(row=0, column=0)
+            
+            self.amount_entry = ttk.Entry(frame_2,
+                                    font='arial 16',
+                                    width=6,
+                                    )
+            self.amount_entry.grid(row=0, column=1)
+            
+            label_value = ttk.Label(frame_2,
+                                    text='Valor Unitário:',
+                                    )
+            label_value.grid(row=1, column=0)
+            
+            self.value_entry = ttk.Entry(frame_2,
+                                    font='arial 16',
+                                    width=6,
+                                    )
+            self.value_entry.grid(row=1, column=1)
+
+            # BUTTON FOR PURCHASE        
+            button_purchase = ttk.Button(frame_2,
+                                        text='Confirmar',
+                                        width=10,
+                                        takefocus=0,
+                                        command=self.purchase,
+                                        )
+            button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
+        except TypeError:
+            showerror(message='Nenhum item selecionado')
+            self.top_l.destroy()
 
     def top_level_sell(self) -> None:
         self.top_l = Toplevel(self)
@@ -1424,7 +1470,7 @@ class ListProductsRV(Toplevel):
                                  )
         button_sell.grid(row=3, column=0, columnspan=2, pady=(20, 0))
 
-    def top_level_del(self) -> None:
+    def top_level_delelete(self) -> None:
         self.top_level_del = Toplevel(self)
         self.top_level_del.title('Deletar ativo')
         self.top_level_del.configure(background='#000000')
@@ -1473,6 +1519,150 @@ class ListProductsRV(Toplevel):
                                      )
         button_del.grid(row=2, column=0, columnspan=2, pady=(20, 0))
     
+    def top_level_set_data(self) -> None:
+        self.top_level_sd = Toplevel(self)
+        self.top_level_sd.title('Alterar dados cadastrais')
+        self.top_level_sd.configure(background='#000000')
+        GeneralFunctions.set_size_window(self.top_level_sd, 400, 200)
+        
+        # PRODUCT
+        self.item: list = self.item_selected()
+        
+        # FRAME
+        frame = ttk.Frame(self.top_level_sd)
+        frame.grid(row=0, column=0, padx=(20, 0), pady=(20, 0))
+       
+        # LABEL AND ENTRY FOR DATA
+        label_name = ttk.Label(frame,
+                               text='Nome:',
+                               )
+        label_name.grid(row=0, column=0)
+        
+        self.entry_name = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        self.entry_name.grid(row=0, column=1)
+        self.entry_name.insert('end', self.item[1])
+        
+        label_code = ttk.Label(frame,
+                               text='Código:',
+                               )
+        label_code.grid(row=1, column=0)
+        
+        self.entry_code = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        self.entry_code.grid(row=1, column=1)
+        self.entry_code.insert('end', self.item[2])
+
+        label_category = ttk.Label(frame,
+                                   text='Categoria:',
+                                   )
+        label_category.grid(row=2, column=0)
+
+        choices = ['Ações', 'FIIs']
+        self.entry_category = ttk.Combobox(frame, values=choices, font='arial 14')
+        self.entry_category.grid(row=2, column=1)
+        self.entry_category.set(self.item[3])
+        self.entry_category.bind('<<ComboboxSelected>>', self.get_category)
+
+        # BUTTON FOR CHANGE DATA  
+        button_purchase = ttk.Button(frame,
+                                     text='Confirmar',
+                                     width=10,
+                                     takefocus=0,
+                                     command=self.set_data,
+                                     )
+        button_purchase.grid(row=3, column=0, columnspan=2, pady=(15, 0))
+
+    def top_level_amount_value(self) -> None:
+        self.top_level_set_values = Toplevel(self)
+        self.top_level_set_values.title('Acertar valores')
+        self.top_level_set_values.configure(background='#000000')
+        GeneralFunctions.set_size_window(self.top_level_set_values, 400, 270)
+       
+        # PRODUCT
+        self.item: list = self.item_selected()        
+        
+        # FRAME
+        frame = ttk.Frame(self.top_level_set_values)
+        frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # FRAME_2
+        frame_2 = ttk.Frame(self.top_level_set_values)
+        frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
+        
+        # LABEL AND ENTRY FOR DATA
+        label_id = ttk.Label(frame,
+                             text='ID:',
+                             )
+        label_id.grid(row=0, column=0)
+        
+        entry_id = ttk.Entry(frame,
+                             font='arial 16',
+                             )
+        entry_id.insert('end', self.item[0])
+        entry_id['state'] = 'disabled'
+        entry_id.grid(row=0, column=1)
+        
+        label_name = ttk.Label(frame,
+                               text='Nome:',
+                               )
+        label_name.grid(row=1, column=0)
+        
+        entry_name = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        entry_name.insert('end', self.item[1])
+        entry_name['state'] = 'disabled'
+        entry_name.grid(row=1, column=1)
+        
+        label_code = ttk.Label(frame,
+                               text='Código:',
+                               )
+        label_code.grid(row=2, column=0)
+        
+        entry_code = ttk.Entry(frame,
+                               font='arial 16',
+                               )
+        entry_code.insert('end', self.item[2])
+        entry_code['state'] = 'disabled'
+        entry_code.grid(row=2, column=1)
+
+        label_amount = ttk.Label(frame_2,
+                                 text='Quantidade:',
+                                 )
+        label_amount.grid(row=0, column=0)
+        
+        self.amount_entry = ttk.Entry(frame_2,
+                                 font='arial 16',
+                                 width=12,
+                                 )
+        self.amount_entry.grid(row=0, column=1)
+        self.amount_entry.insert('end', self.item[4])
+        
+        label_value = ttk.Label(frame_2,
+                                text='Valor unitário:',
+                                )
+        label_value.grid(row=1, column=0)
+        
+        self.value_entry = ttk.Entry(frame_2,
+                                       font='arial 16',
+                                       width=12,
+                                       )
+        formatted_value: str = str(self.item[5]).replace('R$', '').split()
+        self.value_entry.grid(row=1, column=1)
+        self.value_entry.insert('end', formatted_value)
+        
+        # BUTTON FOR CHANGE DATA  
+        button_purchase = ttk.Button(frame_2,
+                                     text='Confirmar',
+                                     width=10,
+                                     takefocus=0,
+                                     command=self.change_value_amount,
+                                     )
+        button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
+    
     def purchase(self) -> None:
         code: str = self.item[0]
         label: str = self.item[2]
@@ -1512,8 +1702,8 @@ class ListProductsRV(Toplevel):
                 showinfo(title='Ok',
                         message=f'Venda de {amount} unidade(s) de {label} no total \n'
                                 f'de R$ {self.total_value()} realizada com sucesso.')
-                self.top_l.destroy()
                 self.refresh()
+                self.top_l.destroy()
         except Exception as error:
             showerror(title='Error', message=error)
     
@@ -1534,6 +1724,59 @@ class ListProductsRV(Toplevel):
         total: float = float(value) * int(amount)
 
         return f'{total:.2f}'
+
+    def get_category(self, event) -> str:
+        self.entry_category.select_clear()
+        item: str = self.entry_category.get()
+        return item
+    
+    def set_data(self) -> None:
+        ident: str = self.item[0]
+        name: str = self.entry_name.get().title()
+        code: str = self.entry_code.get().upper()
+        category: str = self.entry_category.get()
+
+        try:
+            if not name or not code or not category:
+                showerror(message='Preencha todos os campos.')
+                return
+            else:
+                self.rep_rv.alterar_dados(ident,
+                                          name,
+                                          code,
+                                          category,
+                                          )
+                showinfo(title='OK', message='Dados alterados com sucesso')
+                self.refresh()
+                self.top_level_sd.destroy()
+        except ValueError:
+            showerror(title='Error', message='Verifique os dados informados.')
+        except Exception:
+            showerror(title='Error', message=f'O Codigo "{code}" já está em uso.')
+
+    def change_value_amount(self) -> None:
+        code: str = self.item[0]
+        amount: str = self.amount_entry.get()
+        value: str = self.value_entry.get().replace(',', '.')
+
+        try:
+            if not amount or not value:
+                showerror(message="Verifique a quantidade e valor informados")
+                return
+            else:
+                self.rep_rv.acertar_valor_quantidade(code,
+                                                     int(amount),
+                                                     float(value),
+                                                     )
+                showinfo(message=f'Dados alterados com sucesso')
+                self.refresh()
+                self.top_level_set_values.destroy()
+        except TypeError:
+            showerror(title='Error', message='Nenhum item selecionado')
+        except ValueError:
+            showerror(message='Entrada de dados inválida')
+        except Exception as error:
+            showerror(message=f'Error: {error}')
     
     def refresh(self) -> None:
         for record in self.tree.get_children():

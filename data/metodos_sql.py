@@ -1,6 +1,6 @@
 try:
-    import sys
     import os
+    import sys
     
     sys.path.append(
         os.path.abspath(
@@ -13,12 +13,13 @@ try:
 except Exception as error:
     print(f'{error}')
 
-from ativos.fiis import Fiis
-from ativos.acoes import Acao
-from ativos.renda_fixa import RendaFixa
-from ativos.tesouro_direto import TesouroDireto
-from ativos.reserva_emergencia import ReservaEmergencia
 import sqlite3 as sq
+
+from ativos.acoes import Acao
+from ativos.fiis import Fiis
+from ativos.renda_fixa import RendaFixa
+from ativos.reserva_emergencia import ReservaEmergencia
+from ativos.tesouro_direto import TesouroDireto
 
 
 class MetodosSqlRV:
@@ -40,7 +41,7 @@ class MetodosSqlRV:
 
     def _get_id_rv(self, id: str) -> int:
         """
-        Param: codigo: str
+        Param: id: str
         return: int
         """
         resultado: int = -1
@@ -127,22 +128,18 @@ class MetodosSqlRV:
         self._cursor.execute(acao, (id,))
         self._conn.commit()
 
-    def acao_sql_alterar_dados(self, ativo: Acao | Fiis, nome: str, codigo: str) -> None:
-        ident: int = self._get_id_rv(ativo.codigo)
-        acao = "UPDATE RV SET nome=?, codigo=? WHERE id=?"
-        self._cursor.execute(acao, (nome, codigo, ident))
+    def acao_sql_alterar_dados(self,
+                               id: str,
+                               nome: str,
+                               codigo: str,
+                               categoria: str) -> None:
+        acao = "UPDATE RV SET nome=?, codigo=?, categoria=? WHERE id=?"
+        self._cursor.execute(acao, (nome, codigo, categoria, id))
         self._conn.commit()
 
-    def acao_sql_acertar_quantidade(self, ativo: Acao | Fiis, qtde: int) -> None:
-        ident: int = self._get_id_rv(ativo.codigo)
-        acao = "UPDATE RV SET quantidade=? WHERE id=?"
-        self._cursor.execute(acao, (qtde, ident))
-        self._conn.commit()
-
-    def acao_sql_acertar_preco_unit(self, ativo: Acao | Fiis, pu: float) -> None:
-        ident: int = self._get_id_rv(ativo.codigo)
-        acao = "UPDATE RV SET PU=? WHERE id=?"
-        self._cursor.execute(acao, (pu, ident))
+    def acao_sql_acertar_valor_qtde(self, id: str, qtde: int, pu: float) -> None:
+        acao = "UPDATE RV SET quantidade=?, PU=? WHERE id=?"
+        self._cursor.execute(acao, (qtde, pu, id))
         self._conn.commit()
     
     def acao_sql_retorna_tot_invst(self):

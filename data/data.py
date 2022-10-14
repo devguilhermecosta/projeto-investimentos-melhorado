@@ -1,6 +1,6 @@
 try:
-    import sys
     import os
+    import sys
     
     sys.path.append(
         os.path.abspath(
@@ -14,15 +14,17 @@ except Exception as error:
     print(f'{error}')
 
 
-from .exceptions import AtivoJaCadastradoError, AtivoNaoCadastradoError, SaldoInsuficienteError
-from .exceptions import QuantidadeInsuficienteError
-from .metodos_sql import MetodosSqlRF, MetodosSqlRV
-from ativos.fiis import Fiis
-from ativos.acoes import Acao
-from ativos.renda_fixa import RendaFixa
-from ativos.tesouro_direto import TesouroDireto
-from ativos.reserva_emergencia import ReservaEmergencia
 import sqlite3 as sq
+
+from ativos.acoes import Acao
+from ativos.fiis import Fiis
+from ativos.renda_fixa import RendaFixa
+from ativos.reserva_emergencia import ReservaEmergencia
+from ativos.tesouro_direto import TesouroDireto
+
+from .exceptions import (AtivoJaCadastradoError, AtivoNaoCadastradoError,
+                         QuantidadeInsuficienteError, SaldoInsuficienteError)
+from .metodos_sql import MetodosSqlRF, MetodosSqlRV
 
 
 class RepositorioRendaVariavel(MetodosSqlRV):
@@ -82,51 +84,29 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         except Exception as error:
             print(error)
 
-    def alterar_dados(self, ativo: Acao | Fiis, nome: str, codigo: str) -> int | None:
+    def alterar_dados(self, id: str, nome: str, codigo: str, categoria: str) -> int | None:
         """       
-        Param: ativo: Object -> Acao | Fiis
+        Param: id: str
         Param: nome: str
         Param: codigo: str
-        
-        Raise: AtivoNaoCadastradoError  
+        Param: categoria: str
            
         return 0 or None
         """
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_alterar_dados(ativo, nome, codigo)
-            return 0
+        self.acao_sql_alterar_dados(id, nome, codigo, categoria)
+        return 0
 
-    def acertar_quantidade(self, ativo: Acao | Fiis, qtde: int) -> int | None:
+
+    def acertar_valor_quantidade(self, id: str, qtde: int, pu: float) -> int | None:
         """
-        Param: ativo: Object -> Acao | Fiis
+        Param: id: str
         Param: qtde: int
-        
-        Raise: AtivoNaoCadastradoError
-        
-        return 0 or None
-        """
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_acertar_quantidade(ativo, qtde)
-            return 0
-
-    def acertar_preco_unit(self, ativo: Acao | Fiis, pu: float) -> int | None:
-        """        
-        Param: ativo: Object -> Acao | Fiis
         Param: pu: float
         
-        Raise: AtivoNaoCadastradoError
-        
         return 0 or None
         """
-        if not self._existe_ativo(ativo.codigo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_acertar_preco_unit(ativo, pu)            
-            return 0
+        self.acao_sql_acertar_valor_qtde(id, qtde, pu)
+        return 0
     
     def relatorio_acoes(self):
         acao: str = "SELECT * FROM RV"
