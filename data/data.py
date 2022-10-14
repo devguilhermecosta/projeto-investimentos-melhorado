@@ -31,16 +31,10 @@ class RepositorioRendaVariavel(MetodosSqlRV):
     def cadastrar_ativo(self, ativo: Acao | Fiis) -> int | None:
         """       
         Param: ativo: Object -> Acao | Fiis
-        
-        Raise: AtivoJaCadastradoError
               
-        return 0 or None
+        return None
         """
-        if self._existe_ativo(ativo.codigo):
-            raise AtivoJaCadastradoError('Ativo já cadastrado.')
-        else:
-            self.acao_sql_cadastrar_ativo(ativo)
-            return 0
+        self.acao_sql_cadastrar_ativo(ativo)
     
     def comprar(self, id: str, qtde: int, pu: float) -> int | None:
         """
@@ -48,14 +42,9 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         Param: qtde: int
         Param: pu: float
         
-        Raise: AtivoNaoCadastradoError
-        
         return 0 or None
         """      
-        try:
-            self.acao_aql_comprar_ativo(id, qtde, pu)
-        except Exception as error:
-            print(error)
+        self.acao_aql_comprar_ativo(id, qtde, pu)
             
     def vender(self, id: str, qtde: int, pu: float) -> None:
         """
@@ -63,14 +52,9 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         Param: qtde: int
         Param: pu: float
         
-        Raise: QuantidadeInsuficienteError
-        
         return None
         """
-        try:
-            self.acao_sql_vender(id, qtde, pu)
-        except QuantidadeInsuficienteError:
-            raise QuantidadeInsuficienteError('Quantidade insuficiente para venda')
+        self.acao_sql_vender(id, qtde, pu)
       
     def deletar(self, id: str) -> int:
         """
@@ -78,11 +62,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         
         return 0 or None
         """
-        try:
-            self.acao_sql_deletar_ativo(id)
-            return 0
-        except Exception as error:
-            print(error)
+        self.acao_sql_deletar_ativo(id)
 
     def alterar_dados(self, id: str, nome: str, codigo: str, categoria: str) -> int | None:
         """       
@@ -94,8 +74,6 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         return 0 or None
         """
         self.acao_sql_alterar_dados(id, nome, codigo, categoria)
-        return 0
-
 
     def acertar_valor_quantidade(self, id: str, qtde: int, pu: float) -> int | None:
         """
@@ -103,10 +81,9 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         Param: qtde: int
         Param: pu: float
         
-        return 0 or None
+        return None
         """
         self.acao_sql_acertar_valor_qtde(id, qtde, pu)
-        return 0
     
     def relatorio_acoes(self):
         acao: str = "SELECT * FROM RV"
@@ -144,17 +121,11 @@ class RepositorioRendaVariavel(MetodosSqlRV):
 class RepositorioRendaFixa(MetodosSqlRF):      
     def cadastrar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
         """
-        Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia  
+        Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia   
         
-        Raise: AtivoJaCadastradoError   
-        
-        return 0 or None
+        return None
         """        
-        if self._existe(ativo):
-            raise AtivoJaCadastradoError('Ativo já cadastrado')
-        else:
-            self.acao_sql_insert(ativo)
-        return 0
+        self.acao_sql_insert(ativo)
     
     def comprar(self,
                 ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
@@ -164,16 +135,10 @@ class RepositorioRendaFixa(MetodosSqlRF):
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: qtde: int
         Param: valor: float
-        
-        Raise: AtivoNaoCadastradoError
-        
-        return int -> -1 se não comprado ou 0 se comprado
+                
+        return None
         """
-        resultado: int = -1
-        try:
-            self.acao_sql_comprar(ativo, qtde, valor)
-        except AtivoNaoCadastradoError:
-            print('Ativo não cadastrado')
+        self.acao_sql_comprar(ativo, qtde, valor)
     
     def resgatar(self,
                  ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
@@ -184,17 +149,9 @@ class RepositorioRendaFixa(MetodosSqlRF):
         Param: qtde: int
         Param: valor: float
         
-        Raise: AtivoNaoCadastradoError, SaldoInsuficienteError
-        
-        return 0 or None
+        return None
         """
-        if not self._existe(ativo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        elif self.acao_sql_get_saldo(ativo) <= 0:
-            raise SaldoInsuficienteError('Saldo insuficiente para resgate')
-        else:
-            self.acao_sql_alterar_saldo_apos_resgate(ativo, qtde, valor)
-            return 0
+        self.acao_sql_alterar_saldo_apos_resgate(ativo, qtde, valor)
         
     def alterar_dados_ativo(self,
                              id: str,
@@ -210,15 +167,15 @@ class RepositorioRendaFixa(MetodosSqlRF):
         Param: data_vencimento: str
         Param: rentabilidade: str
         
-        Raise: AtivoNaoCadastradoError
-        
-        return 0 or None
+        return None
         """
-        try:
-            self.acao_sql_alterar_dados(id, nome, categoria, data_resgate, data_vencimento,
-                                        rentabilidade)
-        except AtivoNaoCadastradoError:
-            print('Ativo não cadastrado')
+        self.acao_sql_alterar_dados(id,
+                                    nome,
+                                    categoria,
+                                    data_resgate,
+                                    data_vencimento,
+                                    rentabilidade,
+                                    )
         
     def acertar_valor_aplicado(self,
                                ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
@@ -228,28 +185,17 @@ class RepositorioRendaFixa(MetodosSqlRF):
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: valor: float
         
-        Raise: AtivoNaoCadastradoError
-        
-        return 0 or None
+        return None
         """
-        try:
-            self.acao_sql_acertar_valor_aplicado(ativo, valor, quantidade)
-        except AtivoNaoCadastradoError:
-            print('Ativo não cadastrado')
+        self.acao_sql_acertar_valor_aplicado(ativo, valor, quantidade)
         
     def deletar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
-            
-        Raise: AtivoNaoCadastradoError
         
-        return 0 or None
+        return None
         """
-        if not self._existe(ativo):
-            raise AtivoNaoCadastradoError('Ativo não cadastrado')
-        else:
-            self.acao_sql_deletar_ativo(ativo)
-            return 0
+        self.acao_sql_deletar_ativo(ativo)
     
     def relatorio_res_emerg(self) -> int | float:
         acao: str = "SELECT * FROM RF"

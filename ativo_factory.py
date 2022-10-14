@@ -2,8 +2,8 @@ from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
 from modulos.ativos.acoes import Acao
 from modulos.ativos.fiis import Fiis
 from modulos.ativos.renda_fixa import RendaFixa
-from modulos.ativos.tesouro_direto import TesouroDireto
 from modulos.ativos.reserva_emergencia import ReservaEmergencia
+from modulos.ativos.tesouro_direto import TesouroDireto
 
 """
 A ideia aqui é criar uma fábrica que retorna objetos prontos,
