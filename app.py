@@ -3,19 +3,24 @@ from sqlite3 import IntegrityError
 from time import sleep
 from tkinter import Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
+
 from ttkthemes import ThemedTk
+
 from ativo_factory import AtivoFactory
 
 
 class PyInvest:
     def __init__(self):
-                        
+
         # MASTER
         self.master = ThemedTk(theme='black')
         self.master.title('PyInvest')
         self.master.configure(background='#000000')
         self.general_functions = GeneralFunctions()
         self.general_functions.set_size_window(self.master, 1016, 490)
+
+        # VARIABLES
+        sticky: str = ('n', 'e', 's', 'w')
 
         if sys.platform == 'win32':
             self.master.iconbitmap('images/logo.ico')
@@ -25,14 +30,24 @@ class PyInvest:
         self.frame_buttons.configure(relief='ridge',
                                      borderwidth=2,
                                      )
-        self.frame_buttons.grid(row=0, column=0, padx=10, pady=10, sticky=('n', 'e', 's', 'w'))
+        self.frame_buttons.grid(row=0,
+                                column=0,
+                                padx=10,
+                                pady=10,
+                                sticky=sticky,
+                                )
 
         # FRAME FOR REPORTS
         self.frame_report = FrameReport(self.master)
         self.frame_report.configure(relief='ridge',
                                     borderwidth=2,
                                     )
-        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=('n', 'e', 's', 'w',))
+        self.frame_report.grid(row=0,
+                               column=1,
+                               padx=5,
+                               pady=10,
+                               sticky=sticky,
+                               )
 
         # ADAPTATIVE
         self.master.columnconfigure(1, weight=1)
@@ -45,43 +60,43 @@ class PyInvest:
 class ButtonMenu(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-        
+
         s = ttk.Style()
         s.configure('TButton',
                     width=20,
                     padding=10,
                     anchor='center',
                     font='arial 20',
-                        )
-        s.map('TButton',
-                background=[('disabled', '#ccc'),
-                            ('!active', '#009E2D'),
-                            ('pressed', '#9BF0B7'), 
-                            ('active', '#10EB4E'),
-                            ],
-                foreground=[('pressed', '#575757')],
                     )
+        s.map('TButton',
+              background=[('disabled', '#ccc'),
+                          ('!active', '#009E2D'),
+                          ('pressed', '#9BF0B7'),
+                          ('active', '#10EB4E'),
+                          ],
+              foreground=[('pressed', '#575757')],
+              )
 
         sticky: tuple = ('n', 'e', 's', 'w',)
 
         button_register = ttk.Button(self,
-                                    text='CADASTRAR',
-                                    takefocus=0,
-                                    command=lambda: TopLevelRegister(master),
-                                    )
+                                     text='CADASTRAR',
+                                     takefocus=0,
+                                     command=lambda: TopLevelRegister(master),
+                                     )
         button_register.grid(row=0, column=0, padx=10, pady=10, sticky=sticky)
 
         button_list = ttk.Button(self,
-                                text='RENDA FIXA',
-                                takefocus=0,
-                                command=lambda: ListProductsRF(master))
+                                 text='RENDA FIXA',
+                                 takefocus=0,
+                                 command=lambda: ListProductsRF(master))
         button_list.grid(row=1, column=0, padx=10, pady=10, sticky=sticky)
 
         button_sell = ttk.Button(self,
-                                text='RENDA VARIÁVEL',
-                                takefocus=0,
-                                command=lambda: ListProductsRV(master),
-                                )
+                                 text='RENDA VARIÁVEL',
+                                 takefocus=0,
+                                 command=lambda: ListProductsRV(master),
+                                 )
         button_sell.grid(row=2, column=0, padx=10, pady=10, sticky=sticky)
 
         self.rowconfigure(0, weight=1)
@@ -99,35 +114,56 @@ class FrameReport(ttk.Frame):
 
         # STYLES
         s = ttk.Style()
-        s.configure('L.TLabel', font='arial, 20', foreground='white', background='black',
-                     anchor='center')
-        s.configure('T.TLabel', font='arial, 24 bold', foreground='#10EB4E', background='black',
-                     anchor='center')
+        s.configure('L.TLabel',
+                    font='arial, 20',
+                    foreground='white',
+                    background='black',
+                    anchor='center',
+                    )
+        s.configure('T.TLabel',
+                    font='arial, 24 bold',
+                    foreground='#10EB4E',
+                    background='black',
+                    anchor='center'
+                    )
         s.configure('TFrame', background='black')
 
         sticky: tuple = ('n', 'e', 's', 'w',)
 
         # LABELS FOR REPORTS
-        label_actions = ttk.Label(self,
-                                  text=f'Total investido em Ações: R$ {self.report_actions()}',
-                                  style='L.TLabel',
-                                  )
+        text_action: str = 'Total investido em Ações: '\
+            f'R$ {self.report_actions()}'
+        label_actions = ttk.Label(
+                            self,
+                            text=text_action,
+                            style='L.TLabel',
+                            )
         label_actions.grid(row=0, column=0, padx=5, pady=5, sticky=sticky)
 
+        text_fii: str = f'Total investido em FIIs: R$ {self.report_fiis()}'
         label_fii = ttk.Label(self,
-                              text=f'Total investido em FIIs: R$ {self.report_fiis()}',
+                              text=text_fii,
                               style='L.TLabel',
                               )
         label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=sticky)
 
+        text_dt: str = 'Total investido no Tesouro Direto:'\
+            f'R$ {self.report_direct_treasure()}'
         label_direct_treasure = ttk.Label(self,
-                                          text=f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}',
+                                          text=text_dt,
                                           style='L.TLabel',
                                           )
-        label_direct_treasure.grid(row=2, column=0, padx=5, pady=5, sticky=sticky)
+        label_direct_treasure.grid(row=2,
+                                   column=0,
+                                   padx=5,
+                                   pady=5,
+                                   sticky=sticky,
+                                   )
 
+        text_fi: str = 'Total investido em Renda Fixa: '\
+            f'R$ {self.report_fixed_income()}'
         label_fixed_income = ttk.Label(self,
-                                       text=f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}',
+                                       text=text_fi,
                                        style='L.TLabel',
                                        )
         label_fixed_income.grid(row=3, column=0, padx=5, pady=5, sticky=sticky)
