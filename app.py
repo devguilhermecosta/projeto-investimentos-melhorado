@@ -6,7 +6,6 @@ from tkinter.messagebox import showerror, showinfo
 from ttkthemes import ThemedTk
 
 from ativo_factory import AtivoFactory
-from data.data import RepositorioRendaFixa, RepositorioRendaVariavel
 from data.exceptions import AtivoJaCadastradoError
 
 
@@ -246,6 +245,7 @@ class TLRegVariableIncome(Toplevel):
         s.configure('RV.TRadiobutton',
                     background='#000000',
                     foreground='white',
+                    takefocus=0,
                     font='arial 20',
                     )
                     
@@ -263,6 +263,9 @@ class TLRegVariableIncome(Toplevel):
                     font='arila 20',
                     padding=10,
                     )
+        s.map('RV.TRadiobutton',
+              background=[('active', '#000000'),]
+        )
 
         # NAME
         label_name = ttk.Label(self,
@@ -365,6 +368,7 @@ class TLRegVariableIncome(Toplevel):
                     
             except IntegrityError:
                 showerror(title='Error', message='Ativo já cadastrado na base de dados')
+                return
             
         if self.check_fii:
             try:
@@ -385,11 +389,13 @@ class TLRegVariableIncome(Toplevel):
                     self.entry_name.delete(0, 'end')
                     self.entry_code.delete(0, 'end')
                     
-            except AtivoJaCadastradoError:
+            except IntegrityError:
                 showerror(title='Error', message='Ativo já cadastrado no banco de dados')
+                return
                 
         if not self.check_action and not self.check_fii:
             showerror(title='Error', message='Preencha todos os dados')
+            return
         
     def quit(self) -> None:
         self.destroy()
@@ -404,22 +410,17 @@ class TLRegFixedleIncome(Toplevel):
 
         # STYLES
         s = ttk.Style()
-        s.configure('RF.TRadiobutton',
-                    background='#000000',
-                    foreground='white',
-                    font='arial 20',
-                    )
-                    
         s.configure('RF.TFrame',
                     background='#000000',
                     )
-        
+    
         s.configure('RF.TLabel',
                     background='#000000',
                     foreground='white',
                     font='arila 20',
                     padding=10,
                     )
+
         s.configure('TLabel',
                     background='#000000',
                     )
@@ -442,9 +443,9 @@ class TLRegFixedleIncome(Toplevel):
 
         # MONEY REDEMPTION
         label_redemption = ttk.Label(self,
-                                          text='Resgate:',
-                                          style='RF.TLabel',
-                                          )
+                                    text='Resgate:',
+                                    style='RF.TLabel',
+                                    )
         label_redemption.grid(row=2, column=0)
 
         self.entry_redemption = ttk.Entry(self,
