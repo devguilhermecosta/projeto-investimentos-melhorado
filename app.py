@@ -71,9 +71,9 @@ class ButtonMenu(ttk.Frame):
         button_register.grid(row=0, column=0, padx=10, pady=10, sticky=sticky)
 
         button_list = ttk.Button(self,
-                                    text='RENDA FIXA',
-                                    takefocus=0,
-                                    command=lambda: ListProductsRF(master))
+                                text='RENDA FIXA',
+                                takefocus=0,
+                                command=lambda: ListProductsRF(master))
         button_list.grid(row=1, column=0, padx=10, pady=10, sticky=sticky)
 
         button_sell = ttk.Button(self,
