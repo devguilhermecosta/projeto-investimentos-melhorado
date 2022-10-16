@@ -1,8 +1,6 @@
-from lib2to3.pytree import type_repr
-from shutil import ExecError
 from sqlite3 import IntegrityError
 from time import sleep
-from tkinter import StringVar, Toplevel, ttk
+from tkinter import Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
 
 from ttkthemes import ThemedTk
@@ -95,6 +93,10 @@ class FrameReport(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
 
+        # VARIABLES
+        self.rep_rf = AtivoFactory().rep_rf
+        self.rep_rv = AtivoFactory().rep_rv
+
         # STYLES
         s = ttk.Style()
         s.configure('L.TLabel', font='arial, 20', foreground='white', background='black',
@@ -152,39 +154,32 @@ class FrameReport(ttk.Frame):
         self.rowconfigure(5, weight=1)
     
     def report_actions(self) -> str:
-        rep = RepositorioRendaVariavel()
-        tot = rep.relatorio_acoes()
+        tot: str = self.rep_rv.relatorio_acoes()
         return f'{tot:.2f}'
 
     def report_fiis(self) -> str:
-        rep = RepositorioRendaVariavel()
-        tot = rep.relatorio_fiis()
+        tot: str = self.rep_rv.relatorio_fiis()
         return f'{tot:.2f}'
 
     def report_emergency_reserv(self) -> str:
-        rep = RepositorioRendaFixa()
-        tot = rep.relatorio_res_emerg()
+        tot: str = self.rep_rf.relatorio_res_emerg()
         return f'{tot:.2f}'
     
     def report_direct_treasure(self) -> str:
-        rep = RepositorioRendaFixa()
-        tot = rep.relatorio_tesouro_direto()
+        tot: str = self.rep_rf.relatorio_tesouro_direto()
         return f'{tot:.2f}'
 
     def report_fixed_income(self) -> str:
-        rep = RepositorioRendaFixa()
-        tot = rep.relatorio_renda_fixa()
+        tot: str = self.rep_rf.relatorio_renda_fixa()
         return f'{tot:.2f}'
     
     def report_total_invested(self) -> str:
-        rv = RepositorioRendaVariavel()
-        rf = RepositorioRendaFixa()
 
-        actions = rv.relatorio_acoes()
-        fiis = rv.relatorio_fiis()
-        fixed_income = rf.relatorio_renda_fixa()
-        direct_treasure = rf.relatorio_tesouro_direto()
-        emergency_reserve = rf.relatorio_res_emerg()
+        actions = self.rep_rv.relatorio_acoes()
+        fiis = self.rep_rv.relatorio_fiis()
+        fixed_income = self.rep_rf.relatorio_renda_fixa()
+        direct_treasure = self.rep_rf.relatorio_tesouro_direto()
+        emergency_reserve = self.rep_rf.relatorio_res_emerg()
         list_of_invest = [actions, fiis, fixed_income, direct_treasure, emergency_reserve]
 
         tot = sum([value for value in list_of_invest])
@@ -217,7 +212,7 @@ class TopLevelRegister:
     # FUNCTIONS
     def open_toplevel_variable_income(self, master) -> None:
         self.top_level.destroy()
-        sleep(1)
+        sleep(0.5)
         TLRegVariableIncome(master,
                             'Cadastro Renda Variável',
                             '#000000',
@@ -226,7 +221,7 @@ class TopLevelRegister:
     
     def open_toplevel_fixed_income(self, master) -> None:
         self.top_level.destroy()
-        sleep(1)
+        sleep(0.5)
         TLRegFixedleIncome(master,
                            'Cadastro Renda Fixa',
                            '#000000',
@@ -344,28 +339,27 @@ class TLRegVariableIncome(Toplevel):
 
     def register(self) -> None:
         if self.check_action:
-            
-            def check_data(data: tuple, step: int):
+            def check_data(data: tuple, step: int) -> bool:
                 for i in data:
                     if len(i) < step:
                         return False
                     else:
                         return True
             try:
-                name = self.entry_name.get().title()
-                code = self.entry_code.get().upper()
+                name: str = self.entry_name.get().title()
+                code: str = self.entry_code.get().upper()
 
                 if not check_data((name, code), 1):
-                    showerror(message='Preencha todos os dados')
+                    showerror(title='Error', message='Preencha todos os dados')
                     return
-                    
+
                 elif not check_data((code,), 5):
-                    showerror(message='O código precisa ter pelo menos 5 caracteres')
+                    showerror(title='Error', message='O código precisa ter pelo menos 5 caracteres')
                     return
                     
                 else:
                     self.repository.criar_acao(name, code)
-                    showinfo(message='Ativo cadastrado com sucesso.')
+                    showinfo(title='OK', message='Ativo cadastrado com sucesso.')
                     self.entry_name.delete(0, 'end')
                     self.entry_code.delete(0, 'end')
                     
@@ -374,26 +368,28 @@ class TLRegVariableIncome(Toplevel):
             
         if self.check_fii:
             try:
-                name = self.entry_name.get().title()
-                code = self.entry_code.get().upper()
+                name: str = self.entry_name.get().title()
+                code: str = self.entry_code.get().upper()
 
                 if len(name) == 0 or len(code) == 0:
-                    showerror(message='Preencha todos os dados')
+                    showerror(title='Error', message='Preencha todos os dados')
+                    return
                     
                 elif len(code) < 5:
-                    showerror(message='O código precisa ter pelo menos 5 caracteres')
-                    
+                    showerror(title='Error', message='O código precisa ter pelo menos 5 caracteres')
+                    return
+
                 else:
                     self.repository.criar_fii(name, code)
-                    showinfo(message='Ativo cadastrado com sucesso.')
+                    showinfo(title='OK', message='Ativo cadastrado com sucesso.')
                     self.entry_name.delete(0, 'end')
                     self.entry_code.delete(0, 'end')
                     
             except AtivoJaCadastradoError:
-                showerror(message='Ativo já cadastrado no banco de dados')
+                showerror(title='Error', message='Ativo já cadastrado no banco de dados')
                 
         if not self.check_action and not self.check_fii:
-            showerror(message='Preencha todos os dados')
+            showerror(title='Error', message='Preencha todos os dados')
         
     def quit(self) -> None:
         self.destroy()
@@ -544,7 +540,7 @@ class TLRegFixedleIncome(Toplevel):
     # FUNCTIONS    
     def select_option(self) -> None: 
         
-        self.state = self.options.get()
+        self.state: str = self.options.get()
         
         if self.state == 'Renda Fixa' or self.state == 'Reserva de Emergência':
             self.entry_name['state'] = 'normal'
@@ -574,19 +570,19 @@ class TLRegFixedleIncome(Toplevel):
     def register(self) -> None:
         self.rep_rf = AtivoFactory()
         
-        name = self.entry_name.get().upper()
-        redemption = self.entry_redemption.get().upper()
-        expiration = self.entry_expiration.get().upper()
-        profitability = self.entry_profitability.get().upper()
-        payment = self.entry_payment.get().upper()
+        name: str = self.entry_name.get().upper()
+        redemption: str = self.entry_redemption.get().upper()
+        expiration: str = self.entry_expiration.get().upper()
+        profitability: str = self.entry_profitability.get().upper()
+        payment: str = self.entry_payment.get().upper()
         
-        list_one = [name, redemption, expiration, profitability]
-        list_two = [name, redemption, expiration, profitability, payment]
+        list_one: list = [name, redemption, expiration, profitability]
+        list_two: list = [name, redemption, expiration, profitability, payment]
         
         try:
             if self.state == 'Renda Fixa':
                 if not self.check_one(list_one):
-                    showerror(message='Verifique os dados informados')
+                    showerror(title='Error', message='Verifique os dados informados')
                     return
                 else:
                     self.rep_rf.criar_renda_fixa(name,
@@ -598,11 +594,11 @@ class TLRegFixedleIncome(Toplevel):
                     self.entry_redemption.delete(0, 'end')
                     self.entry_expiration.delete(0, 'end')
                     self.entry_profitability.delete(0, 'end')
-                    showinfo(message='Ativo cadastrado com sucesso')
+                    showinfo(title='OK', message='Ativo cadastrado com sucesso')
             
             elif self.state == 'Reserva de Emergência':
                 if not self.check_one(list_one):
-                    showerror(message='Verifique os dados informados')
+                    showerror(title='Error', message='Verifique os dados informados')
                     return
                 else:
                     self.rep_rf.criar_reserva_emergencia(name,
@@ -614,11 +610,11 @@ class TLRegFixedleIncome(Toplevel):
                     self.entry_redemption.delete(0, 'end')
                     self.entry_expiration.delete(0, 'end')
                     self.entry_profitability.delete(0, 'end')
-                    showinfo(message='Ativo cadastrado com sucesso')
+                    showinfo(title='OK', message='Ativo cadastrado com sucesso')
             
             elif self.state == 'Tesouro Direto':
                 if not self.check_one(list_two):
-                    showerror(message='Verifique os dados informados')
+                    showerror(title='Error', message='Verifique os dados informados')
                     return
                 else:
                     self.rep_rf.criar_tesouro_direto(name,
@@ -632,10 +628,10 @@ class TLRegFixedleIncome(Toplevel):
                     self.entry_expiration.delete(0, 'end')
                     self.entry_profitability.delete(0, 'end')
                     self.entry_payment.delete(0, 'end')
-                    showinfo(message='Ativo cadastrado com sucesso')
+                    showinfo(title='OK', message='Ativo cadastrado com sucesso')
                 
-        except AtivoJaCadastradoError:
-            showerror(message='Ativo já cadastrado na base de dados.')
+        except IntegrityError:
+            showerror(title='Error', message='Ativo já cadastrado na base de dados.')
     
     def check_one(self, list) -> bool:
         amount: int = int(len(list))
@@ -655,7 +651,7 @@ class ListProductsRF(Toplevel):
         GeneralFunctions.set_size_window(self, 1200, 600)
         
         # VARIABLES
-        self.rep_rf = RepositorioRendaFixa()
+        self.rep_rf = AtivoFactory().rep_rf
 
         # STYLES
         self.s = ttk.Style()
@@ -897,7 +893,7 @@ class ListProductsRF(Toplevel):
                                     )
             label_category.grid(row=1, column=0)
 
-            choices = ['Renda Fixa', 'Tesouro Direto', 'Reserva de Emergência']
+            choices: list = ['Renda Fixa', 'Tesouro Direto', 'Reserva de Emergência']
             self.entry_category = ttk.Combobox(frame, values=choices, font='arial 14')
             self.entry_category.grid(row=1, column=1)
             self.entry_category.set(self.item[3])
@@ -991,11 +987,11 @@ class ListProductsRF(Toplevel):
             
             # BUTTON FOR DELL
             button_dell = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.dell,
-                                        )
+                                    text='Confirmar',
+                                    width=10,
+                                    takefocus=0,
+                                    command=self.dell,
+                                    )
             button_dell.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_level_del.destroy()
@@ -1033,13 +1029,13 @@ class ListProductsRF(Toplevel):
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                    text='Nome:',
+                                    )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                    font='arial 16',
+                                    )
             entry_name.insert('end', self.item[1])
             entry_name['state'] = 'disabled'
             entry_name.grid(row=1, column=1)
@@ -1082,12 +1078,12 @@ class ListProductsRF(Toplevel):
             showerror(title='Error', message='Nenhum item selecionado')
         
     def purchase(self) -> None:
-        amount = self.amount_entry.get()
-        value = self.value_entry.get().replace(',', '.')
+        amount: str = self.amount_entry.get()
+        value: str = self.value_entry.get().replace(',', '.')
         code: str = str(self.item[0])
                 
         try:
-            if not amount or not value or amount =='' or value == '':
+            if not amount or not value or amount == '' or value == '':
                 showerror(title='Error', message="Verifique a quantidade e valor informados")
                 return
             else:
@@ -1098,36 +1094,36 @@ class ListProductsRF(Toplevel):
         except ValueError:
             showerror(title='Error', message='Entrada de dados inválida')
         except Exception as error:
-            showerror(message=f'Error: {error}')
+            showerror(title='Error', message=f'Error: {error}')
     
     def dell(self) -> None:
         code: str = str(self.item[1])
         try:
             self.rep_rf.deletar_ativo(code)
-            showinfo(message=f'Ativo deletado com sucesso')
+            showinfo(title='OK', message=f'Ativo deletado com sucesso')
             self.refresh()
             self.top_level_del.destroy()
         except Exception as error:
-            showerror(message=f'Error: {error}')
+            showerror(title='Error', message=f'Error: {error}')
     
     def change_value_amount(self) -> None:
         code: str = str(self.item[0])
-        amount = self.amount_entry.get()
-        value = self.value_entry.get().replace(',', '.')
+        amount: str = self.amount_entry.get()
+        value: str = self.value_entry.get().replace(',', '.')
 
         try:
-            if not amount or not value or amount =='' or value == '':
-                showerror(message="Verifique a quantidade e valor informados")
+            if not amount or not value or amount == '' or value == '':
+                showerror(title='Error', message="Verifique a quantidade e valor informados")
                 return
             else:
                 self.rep_rf.acertar_valor_aplicado(code, float(value), int(amount))
-                showinfo(message=f'Dados alterados com sucesso')
+                showinfo(title='OK', message=f'Dados alterados com sucesso')
                 self.refresh()
                 self.top_level_change.destroy()
         except ValueError:
-            showerror(message='Entrada de dados inválida')
+            showerror(title='Error', message='Entrada de dados inválida')
         except Exception as error:
-            showerror(message=f'Error: {error}')
+            showerror(title='Error', message=f'Error: {error}')
 
     def get_category(self, event) -> str:
         self.entry_category.select_clear()
@@ -1144,7 +1140,7 @@ class ListProductsRF(Toplevel):
 
         try:
             if not name or not category or not redeem or not expiration or not profitability:
-                showerror(message='Preencha todos os campos.')
+                showerror(title='Error', message='Preencha todos os campos.')
                 return
             else:
                 self.rep_rf.alterar_dados_ativo(code,
@@ -1167,7 +1163,6 @@ class ListProductsRF(Toplevel):
     def refresh(self) -> None:
         for record in self.tree.get_children():
             self.tree.delete(record)
-        
         self.list_items()
 
 
@@ -1180,7 +1175,7 @@ class ListProductsRV(Toplevel):
         GeneralFunctions.set_size_window(self, 1200, 600)
 
         # VARIABLES
-        self.rep_rv = RepositorioRendaVariavel()
+        self.rep_rv = AtivoFactory().rep_rv
         self.check: bool = False
 
         # STYLES
@@ -1283,7 +1278,7 @@ class ListProductsRV(Toplevel):
                                      style='R.TButton',
                                      width=8,
                                      takefocus=0,
-                                     command=self.top_level_delelete,
+                                     command=self.top_level_delete,
                                      )
         self.button_dell.grid(row=0, column=2, pady=(5, 10), padx=10)
 
@@ -1460,7 +1455,7 @@ class ListProductsRV(Toplevel):
             entry_code.grid(row=2, column=1)
             entry_code.insert('end', self.item[2])
             
-            # LABEL AND ENTRY FOR PURCHASE        
+            # LABEL AND ENTRY FOR SELL    
             label_amount = ttk.Label(frame_2,
                                     text='Quantidade:',
                                     )
@@ -1495,7 +1490,7 @@ class ListProductsRV(Toplevel):
             self.top_l.destroy()
             showerror(title='Error', message='Nenhum item selecionado')
 
-    def top_level_delelete(self) -> None:
+    def top_level_delete(self) -> None:
         try:
             self.top_level_del = Toplevel(self)
             self.top_level_del.title('Deletar ativo')
@@ -1538,11 +1533,11 @@ class ListProductsRV(Toplevel):
             
             # BUTTON FOR DEL
             button_del = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.delete,
-                                        )
+                                    text='Confirmar',
+                                    width=10,
+                                    takefocus=0,
+                                    command=self.delete,
+                                    )
             button_del.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_level_del.destroy()
@@ -1590,7 +1585,7 @@ class ListProductsRV(Toplevel):
                                     )
             label_category.grid(row=2, column=0)
 
-            choices = ['Ações', 'FIIs']
+            choices: list = ['Ações', 'FIIs']
             self.entry_category = ttk.Combobox(frame, values=choices, font='arial 14')
             self.entry_category.grid(row=2, column=1)
             self.entry_category.set(self.item[3])
@@ -1818,7 +1813,6 @@ class ListProductsRV(Toplevel):
     def refresh(self) -> None:
         for record in self.tree.get_children():
             self.tree.delete(record)
-
         self.list_items()
 
 
