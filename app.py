@@ -18,7 +18,7 @@ class PyInvest:
         self.general_functions.set_size_window(self.master, 1016, 490)
 
         if sys.platform == 'win32':
-            self.master.iconbitmap('logo.ico')
+            self.master.iconbitmap('images/logo.ico')
 
         # BUTTONS OF MENU
         self.frame_buttons = ButtonMenu(self.master)
