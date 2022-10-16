@@ -1,12 +1,10 @@
+import sys
 from sqlite3 import IntegrityError
 from time import sleep
 from tkinter import Toplevel, ttk
 from tkinter.messagebox import showerror, showinfo
-
 from ttkthemes import ThemedTk
-
 from ativo_factory import AtivoFactory
-from data.exceptions import AtivoJaCadastradoError
 
 
 class PyInvest:
@@ -18,6 +16,9 @@ class PyInvest:
         self.master.configure(background='#000000')
         self.general_functions = GeneralFunctions()
         self.general_functions.set_size_window(self.master, 1016, 490)
+
+        if sys.platform == 'win32':
+            self.master.iconbitmap('logo.ico')
 
         # BUTTONS OF MENU
         self.frame_buttons = ButtonMenu(self.master)
@@ -173,7 +174,6 @@ class FrameReport(ttk.Frame):
         return f'{tot:.2f}'
     
     def report_total_invested(self) -> str:
-
         actions = self.rep_rv.relatorio_acoes()
         fiis = self.rep_rv.relatorio_fiis()
         fixed_income = self.rep_rf.relatorio_renda_fixa()
