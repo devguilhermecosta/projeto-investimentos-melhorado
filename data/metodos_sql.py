@@ -39,7 +39,7 @@ class MetodosSqlRV:
                 resultado = True
         return resultado
 
-    def _get_id_rv(self, id: str) -> int:
+    def _get_id_rv(self, id: str) -> str:
         """
         Param: id: str
         return: int
@@ -54,7 +54,7 @@ class MetodosSqlRV:
 
     def _quantidade_suficiente(self, id: str) -> bool:
         """
-        Param: ativo: Object -> Acao | Fiis
+        Param: id: str
         Param: nome: str
         Param: codigo: str
     
@@ -72,8 +72,8 @@ class MetodosSqlRV:
 
     def acao_sql_cadastrar_ativo(self, ativo: Acao | Fiis) -> None:
         acao = "INSERT INTO RV" \
-                    "(nome, codigo, categoria, quantidade, PU, PM, PT)" \
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)"
+                "(nome, codigo, categoria, quantidade, PU, PM, PT)" \
+                "VALUES (?, ?, ?, ?, ?, ?, ?)"
         self._cursor.execute(acao, 
                                  (ativo.nome,
                                  ativo.codigo,
@@ -160,21 +160,13 @@ class MetodosSqlRF:
         self._conn = sq.connect('data/data.db')
         self._cursor = self._conn.cursor()
         
-    def _existe(self, nome: str) -> bool:
-        """
-        Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
-        return bool
-        """        
+    def _existe(self, nome: str) -> bool:    
         if self._get_id(nome) != -1:
             return True
         else:
             return False
     
     def _get_id(self, nome: str) -> int:
-        """      
-        Param: nome: -> Nome do ativo
-        return int -> -1 se não existir ou o próprio id
-        """
         resultado: int = -1
         acao: str = "SELECT * FROM RF WHERE nome=?"
         self._cursor.execute(acao, (nome,))
@@ -184,9 +176,9 @@ class MetodosSqlRF:
         return resultado
 
     def acao_sql_alterar_saldo_apos_resgate(self,
-                                              ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
-                                              qtde: int,
-                                              valor: float) -> None:
+                                            ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
+                                            qtde: int,
+                                            valor: float) -> None:
         self.__sub_acao_sql_select_all_com_id(ativo)
         for at in self._cursor.fetchall():
             qtde_atual: int = at[2]
