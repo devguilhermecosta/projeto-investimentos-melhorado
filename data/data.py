@@ -22,8 +22,6 @@ from ativos.renda_fixa import RendaFixa
 from ativos.reserva_emergencia import ReservaEmergencia
 from ativos.tesouro_direto import TesouroDireto
 
-from .exceptions import (AtivoJaCadastradoError, AtivoNaoCadastradoError,
-                         QuantidadeInsuficienteError, SaldoInsuficienteError)
 from .metodos_sql import MetodosSqlRF, MetodosSqlRV
 
 
@@ -36,13 +34,13 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         """
         self.acao_sql_cadastrar_ativo(ativo)
     
-    def comprar(self, id: str, qtde: int, pu: float) -> int | None:
+    def comprar(self, id: str, qtde: int, pu: float) -> None:
         """
-        Param: ativo: Object -> Acao | Fiis
+        Param: id: str
         Param: qtde: int
         Param: pu: float
         
-        return 0 or None
+        return None
         """      
         self.acao_aql_comprar_ativo(id, qtde, pu)
             
@@ -56,22 +54,22 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         """
         self.acao_sql_vender(id, qtde, pu)
       
-    def deletar(self, id: str) -> int:
+    def deletar(self, id: str) -> None:
         """
         Param: id: str
         
-        return 0 or None
+        return None
         """
         self.acao_sql_deletar_ativo(id)
 
-    def alterar_dados(self, id: str, nome: str, codigo: str, categoria: str) -> int | None:
+    def alterar_dados(self, id: str, nome: str, codigo: str, categoria: str) -> None:
         """       
         Param: id: str
         Param: nome: str
         Param: codigo: str
         Param: categoria: str
            
-        return 0 or None
+        return None
         """
         self.acao_sql_alterar_dados(id, nome, codigo, categoria)
 
@@ -85,7 +83,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
         """
         self.acao_sql_acertar_valor_qtde(id, qtde, pu)
     
-    def relatorio_acoes(self):
+    def relatorio_acoes(self) -> float:
         acao: str = "SELECT * FROM RV"
         self._cursor.execute(acao)
         tot: int | float = 0
@@ -96,7 +94,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
 
         return tot
     
-    def relatorio_fiis(self):
+    def relatorio_fiis(self) -> float:
         acao: str = "SELECT * FROM RV"
         self._cursor.execute(acao)
         tot: int | float = 0
@@ -119,7 +117,7 @@ class RepositorioRendaVariavel(MetodosSqlRV):
 
 
 class RepositorioRendaFixa(MetodosSqlRF):      
-    def cadastrar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> int | None:
+    def cadastrar_ativo(self, ativo: RendaFixa | TesouroDireto | ReservaEmergencia) -> None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia   
         
@@ -130,7 +128,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
     def comprar(self,
                 ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
                 qtde: int,
-                valor: float) -> int:
+                valor: float) -> None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: qtde: int
@@ -143,7 +141,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
     def resgatar(self,
                  ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
                  qtde: int,
-                 valor: float) -> int | None:
+                 valor: float) -> None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: qtde: int
@@ -159,9 +157,9 @@ class RepositorioRendaFixa(MetodosSqlRF):
                              categoria: str,
                              data_resgate: str,
                              data_vencimento: str,
-                             rentabilidade: str) -> int | None:
+                             rentabilidade: str) -> None:
         """
-        Param: ativo: id or code
+        Param: id: str
         Param: nome: str
         Param: data_resgate: str
         Param: data_vencimento: str
@@ -180,7 +178,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
     def acertar_valor_aplicado(self,
                                ativo: RendaFixa | TesouroDireto | ReservaEmergencia,
                                valor: float,
-                               quantidade) -> int | None:
+                               quantidade) -> None:
         """
         Param: ativo: Object -> RendaFixa | TesouroDireto | ReservaEmergencia
         Param: valor: float
@@ -197,7 +195,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
         """
         self.acao_sql_deletar_ativo(ativo)
     
-    def relatorio_res_emerg(self) -> int | float:
+    def relatorio_res_emerg(self) -> float:
         acao: str = "SELECT * FROM RF"
         self._cursor.execute(acao)
         tot: int | float = 0
@@ -208,7 +206,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
 
         return tot
     
-    def relatorio_tesouro_direto(self) -> int | float:
+    def relatorio_tesouro_direto(self) -> float:
         acao: str = "SELECT * FROM RF"
         self._cursor.execute(acao)
         tot: int | float = 0
@@ -219,7 +217,7 @@ class RepositorioRendaFixa(MetodosSqlRF):
         
         return tot
 
-    def relatorio_renda_fixa(self) -> int | float:
+    def relatorio_renda_fixa(self) -> float:
         acao: str = "SELECT * FROM RF"
         self._cursor.execute(acao)
         tot: int | float = 0
