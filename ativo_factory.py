@@ -5,12 +5,6 @@ from modulos.ativos.renda_fixa import RendaFixa
 from modulos.ativos.reserva_emergencia import ReservaEmergencia
 from modulos.ativos.tesouro_direto import TesouroDireto
 
-"""
-A ideia aqui é criar uma fábrica que retorna objetos prontos,
-fazendo com o que o usuário não instancie a classe diretamente,
-tento um baixo acoplamento intre a interface e o usuário.
-"""
-
 
 class AtivoFactory:
     def __init__(self):
