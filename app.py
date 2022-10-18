@@ -30,24 +30,14 @@ class PyInvest:
         self.frame_buttons.configure(relief='ridge',
                                      borderwidth=2,
                                      )
-        self.frame_buttons.grid(row=0,
-                                column=0,
-                                padx=10,
-                                pady=10,
-                                sticky=sticky,
-                                )
+        self.frame_buttons.grid(row=0, column=0, padx=10, pady=10, sticky=sticky)
 
         # FRAME FOR REPORTS
         self.frame_report = FrameReport(self.master)
         self.frame_report.configure(relief='ridge',
                                     borderwidth=2,
                                     )
-        self.frame_report.grid(row=0,
-                               column=1,
-                               padx=5,
-                               pady=10,
-                               sticky=sticky,
-                               )
+        self.frame_report.grid(row=0, column=1, padx=5, pady=10, sticky=sticky)
 
         # ADAPTATIVE
         self.master.columnconfigure(1, weight=1)
@@ -124,7 +114,7 @@ class FrameReport(ttk.Frame):
                     font='arial, 24 bold',
                     foreground='#10EB4E',
                     background='black',
-                    anchor='center'
+                    anchor='center',
                     )
         s.configure('TFrame', background='black')
 
@@ -147,8 +137,7 @@ class FrameReport(ttk.Frame):
                               )
         label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=sticky)
 
-        text_dt: str = 'Total investido no Tesouro Direto:'\
-            f'R$ {self.report_direct_treasure()}'
+        text_dt: str = 'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}'
         label_direct_treasure = ttk.Label(self,
                                           text=text_dt,
                                           style='L.TLabel',
@@ -160,22 +149,23 @@ class FrameReport(ttk.Frame):
                                    sticky=sticky,
                                    )
 
-        text_fi: str = 'Total investido em Renda Fixa: '\
-            f'R$ {self.report_fixed_income()}'
+        text_fi: str = 'Total investido em Renda Fixa: R$ {self.report_fixed_income()}'
         label_fixed_income = ttk.Label(self,
                                        text=text_fi,
                                        style='L.TLabel',
                                        )
         label_fixed_income.grid(row=3, column=0, padx=5, pady=5, sticky=sticky)
 
+        text_re: str = f'Total na Reserva de Emergência: R${self.report_emergency_reserv()}'
         label_emergency_reserve = ttk.Label(self,
-                                            text=f'Total na Reserva de Emergência: R${self.report_emergency_reserv()}',
+                                            text=text_re,
                                             style='L.TLabel',
                                             )
         label_emergency_reserve.grid(row=4, column=0, padx=5, pady=5, sticky=sticky)
 
+        text_ti: str = f'Total investido: R$ {self.report_total_invested()}'
         label_total_invest = ttk.Label(self,
-                                       text=f'Total investido: R$ {self.report_total_invested()}',
+                                       text=text_ti,
                                        style='T.TLabel',
                                        )
         label_total_invest.grid(row=5, column=0, sticky=sticky)
@@ -210,14 +200,14 @@ class FrameReport(ttk.Frame):
         return f'{tot:.2f}'
     
     def report_total_invested(self) -> str:
-        actions = self.rep_rv.relatorio_acoes()
-        fiis = self.rep_rv.relatorio_fiis()
-        fixed_income = self.rep_rf.relatorio_renda_fixa()
-        direct_treasure = self.rep_rf.relatorio_tesouro_direto()
-        emergency_reserve = self.rep_rf.relatorio_res_emerg()
-        list_of_invest = [actions, fiis, fixed_income, direct_treasure, emergency_reserve]
+        actions: str = self.rep_rv.relatorio_acoes()
+        fiis: str = self.rep_rv.relatorio_fiis()
+        fixed_income: str = self.rep_rf.relatorio_renda_fixa()
+        direct_treasure: str = self.rep_rf.relatorio_tesouro_direto()
+        emergency_reserve: str = self.rep_rf.relatorio_res_emerg()
+        list_of_invest: list = [actions, fiis, fixed_income, direct_treasure, emergency_reserve]
 
-        tot = sum([value for value in list_of_invest])
+        tot: float = sum([value for value in list_of_invest])
 
         return f'{tot:.2f}'
 
@@ -265,7 +255,7 @@ class TopLevelRegister:
                            )
 
 class TLRegVariableIncome(Toplevel):
-    def __init__(self, master, title, color, width, height):
+    def __init__(self, master, title: str, color: str, width: str, height: str):
         Toplevel.__init__(self, master)
         self.title(title)
         self.configure(background=color)
@@ -438,7 +428,7 @@ class TLRegVariableIncome(Toplevel):
 
 
 class TLRegFixedleIncome(Toplevel):
-    def __init__(self, master, title, color, width, height):
+    def __init__(self, master, title: str, color: str, width: str, height: str):
         Toplevel.__init__(self, master)
         self.title(title)
         self.configure(background=color)
@@ -465,9 +455,9 @@ class TLRegFixedleIncome(Toplevel):
 
         # NAME
         label_name = ttk.Label(self,
-                                text='Nome:',
-                                style='RF.TLabel'
-                                )
+                               text='Nome:',
+                               style='RF.TLabel',
+                               )
         label_name.grid(row=1, column=0)
 
         self.entry_name = ttk.Entry(self,
@@ -493,9 +483,9 @@ class TLRegFixedleIncome(Toplevel):
 
         # EXPIRATION
         label_expiration = ttk.Label(self,
-                                    text='Vencimento:',
-                                    style='RF.TLabel',
-                                    )
+                                     text='Vencimento:',
+                                     style='RF.TLabel',
+                                     )
         label_expiration.grid(row=3, column=0)
 
         self.entry_expiration = ttk.Entry(self,
@@ -507,16 +497,16 @@ class TLRegFixedleIncome(Toplevel):
 
         # PROFITABILITY
         label_profitability = ttk.Label(self,
-                                       text='Rentabilidade:',
-                                       style='RF.TLabel',
-                                       )
+                                        text='Rentabilidade:',
+                                        style='RF.TLabel',
+                                        )
         label_profitability.grid(row=4, column=0)
 
         self.entry_profitability = ttk.Entry(self,
-                                          width=15,
-                                          font='arial 20',
-                                          state='disabled',
-                                          )
+                                             width=15,
+                                             font='arial 20',
+                                             state='disabled',
+                                             )
         self.entry_profitability.grid(row=4, column=1)
 
         # PAYMENT
@@ -530,10 +520,10 @@ class TLRegFixedleIncome(Toplevel):
         label_payment.pack(side='top')
 
         self.entry_payment = ttk.Entry(self.frame_payment,
-                                      width=15,
-                                      font='arial 20',
-                                      state='!active',
-                                      )
+                                       width=15,
+                                       font='arial 20',
+                                       state='!active',
+                                       )
 
         # OPTIONS
         self.frame = ttk.Frame(self, style='RF.TFrame')
@@ -623,10 +613,10 @@ class TLRegFixedleIncome(Toplevel):
                     return
                 else:
                     self.rep_rf.criar_renda_fixa(name,
-                                                redemption,
-                                                expiration,
-                                                profitability,
-                                                )
+                                                 redemption,
+                                                 expiration,
+                                                 profitability,
+                                                 )
                     self.entry_name.delete(0, 'end')
                     self.entry_redemption.delete(0, 'end')
                     self.entry_expiration.delete(0, 'end')
@@ -639,10 +629,10 @@ class TLRegFixedleIncome(Toplevel):
                     return
                 else:
                     self.rep_rf.criar_reserva_emergencia(name,
-                                                        redemption,
-                                                        expiration,
-                                                        profitability,
-                                                        )
+                                                         redemption,
+                                                         expiration,
+                                                         profitability,
+                                                         )
                     self.entry_name.delete(0, 'end')
                     self.entry_redemption.delete(0, 'end')
                     self.entry_expiration.delete(0, 'end')
@@ -655,11 +645,11 @@ class TLRegFixedleIncome(Toplevel):
                     return
                 else:
                     self.rep_rf.criar_tesouro_direto(name,
-                                                    redemption,
-                                                    expiration,
-                                                    profitability,
-                                                    payment,
-                                                    )
+                                                     redemption,
+                                                     expiration,
+                                                     profitability,
+                                                     payment,
+                                                     )
                     self.entry_name.delete(0, 'end')
                     self.entry_redemption.delete(0, 'end')
                     self.entry_expiration.delete(0, 'end')
@@ -768,31 +758,31 @@ class ListProductsRF(Toplevel):
 
         # BUTTONS
         self.button_purchase = ttk.Button(frame,
-                                     text='Comprar',
-                                     state='disabled',
-                                     width=8,
-                                     takefocus=0,
-                                     command=self.top_level_purchase,
-                                     )
+                                          text='Comprar',
+                                          state='disabled',
+                                          width=8,
+                                          takefocus=0,
+                                          command=self.top_level_purchase,
+                                          )
         self.button_purchase.grid(row=0, column=0, pady=(5, 10), padx=10)
 
         self.button_del = ttk.Button(frame,
-                                      text='Deletar',
-                                      state='disabled',
-                                      style='R.TButton',
-                                      width=8,
-                                      takefocus=0,
-                                      command=self.top_level_delete,
-                                      )
+                                     text='Deletar',
+                                     state='disabled',
+                                     style='R.TButton',
+                                     width=8,
+                                     takefocus=0,
+                                     command=self.top_level_delete,
+                                     )
         self.button_del.grid(row=0, column=1, pady=(5, 10), padx=10)
 
         self.button_edit = ttk.Button(frame,
-                                         text='Editar',
-                                         state='disabled',
-                                         width=8,
-                                         takefocus=0,
-                                         command=self.top_level_set_data,
-                                         )
+                                      text='Editar',
+                                      state='disabled',
+                                      width=8,
+                                      takefocus=0,
+                                      command=self.top_level_set_data,
+                                      )
         self.button_edit.grid(row=0, column=2, pady=(5, 10), padx=10)
 
         self.button_change_data = ttk.Button(frame,
@@ -839,37 +829,37 @@ class ListProductsRF(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name.grid(row=1, column=1)
             
             # LABEL AND ENTRY FOR PURCHASE        
             label_amount = ttk.Label(frame_2,
-                                    text='Quantidade:',
-                                    )
+                                     text='Quantidade:',
+                                     )
             label_amount.grid(row=0, column=0)
             
             self.amount_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                          font='arial 16',
+                                          width=6,
+                                          )
             self.amount_entry.grid(row=0, column=1)
             
             label_value = ttk.Label(frame_2,
@@ -878,18 +868,18 @@ class ListProductsRF(Toplevel):
             label_value.grid(row=1, column=0)
             
             self.value_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                         font='arial 16',
+                                         width=6,
+                                         )
             self.value_entry.grid(row=1, column=1)
             
             # BUTTON FOR PURCHASE        
             button_purchase = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.purchase,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.purchase,
+                                         )
             button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_l.destroy()
@@ -915,19 +905,19 @@ class ListProductsRF(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=0, column=0)
             
             self.entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                        font='arial 16',
+                                        )
             self.entry_name.grid(row=0, column=1)
             self.entry_name.insert('end', self.item[1])
 
             label_category = ttk.Label(frame,
-                                    text='Categoria:',
-                                    )
+                                       text='Categoria:',
+                                       )
             label_category.grid(row=1, column=0)
 
             choices: list = ['Renda Fixa', 'Tesouro Direto', 'Reserva de Emergência']
@@ -937,24 +927,24 @@ class ListProductsRF(Toplevel):
             self.entry_category.bind('<<ComboboxSelected>>', self.get_category)
 
             label_redeem = ttk.Label(frame,
-                                    text='Regate:',
-                                    )
+                                     text='Regate:',
+                                     )
             label_redeem.grid(row=2, column=0)
 
             self.entry_redeem = ttk.Entry(frame,
-                                    font='arial 16',
-                                    )
+                                          font='arial 16',
+                                          )
             self.entry_redeem.grid(row=2, column=1)
             self.entry_redeem.insert('end', self.item[4])
 
             label_expiration = ttk.Label(frame,
-                                        text='Vencimento',
-                                        )
+                                         text='Vencimento',
+                                         )
             label_expiration.grid(row=3, column=0)
 
             self.entry_expiration = ttk.Entry(frame,
-                                        font='arial 16',
-                                        )
+                                              font='arial 16',
+                                              )
             self.entry_expiration.grid(row=3, column=1)
             self.entry_expiration.insert('end', self.item[6])
 
@@ -964,18 +954,18 @@ class ListProductsRF(Toplevel):
             label_profitability.grid(row=4, column=0)
 
             self.entry_profitability = ttk.Entry(frame,
-                                            font='arial 16',
-                                            )
+                                                 font='arial 16',
+                                                 )
             self.entry_profitability.grid(row=4, column=1)
             self.entry_profitability.insert('end', self.item[7])
 
             # BUTTON FOR CHANGE DATA  
             button_purchase = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.set_data,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.set_data,
+                                         )
             button_purchase.grid(row=2, column=0, columnspan=2, pady=(5, 0))
         except TypeError:
             self.top_level_rdm.destroy()
@@ -1001,34 +991,34 @@ class ListProductsRF(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name.grid(row=1, column=1)
             
             # BUTTON FOR DELL
             button_dell = ttk.Button(frame_2,
-                                    text='Confirmar',
-                                    width=10,
-                                    takefocus=0,
-                                    command=self.dell,
-                                    )
+                                     text='Confirmar',
+                                     width=10,
+                                     takefocus=0,
+                                     command=self.dell,
+                                     )
             button_dell.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_level_del.destroy()
@@ -1054,38 +1044,38 @@ class ListProductsRF(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id['state'] = 'disabled'
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                    text='Nome:',
-                                    )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                    font='arial 16',
-                                    )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name['state'] = 'disabled'
             entry_name.grid(row=1, column=1)
 
             label_amount = ttk.Label(frame_2,
-                                    text='Quantidade:',
-                                    )
+                                     text='Quantidade:',
+                                     )
             label_amount.grid(row=0, column=0)
             
             self.amount_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=12,
-                                    )
+                                          font='arial 16',
+                                          width=12,
+                                          )
             self.amount_entry.grid(row=0, column=1)
             self.amount_entry.insert('end', self.item[2])
             
@@ -1095,20 +1085,20 @@ class ListProductsRF(Toplevel):
             label_value.grid(row=1, column=0)
             
             self.value_entry = ttk.Entry(frame_2,
-                                        font='arial 16',
-                                        width=12,
-                                        )
+                                         font='arial 16',
+                                         width=12,
+                                         )
             self.value_entry.grid(row=1, column=1)
             formatted_value: str = str(self.item[5]).replace('R$', '').split()
             self.value_entry.insert('end', formatted_value)
             
             # BUTTON FOR CHANGE DATA  
             button_purchase = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.change_value_amount,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.change_value_amount,
+                                         )
             button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_level_change.destroy()
@@ -1292,31 +1282,31 @@ class ListProductsRV(Toplevel):
 
         # BUTTONS
         self.button_purchase = ttk.Button(frame,
-                                     text='Comprar',
-                                     state='disabled',
-                                     width=8,
-                                     takefocus=0,
-                                     command=self.top_level_purchase,
-                                     )
+                                          text='Comprar',
+                                          state='disabled',
+                                          width=8,
+                                          takefocus=0,
+                                          command=self.top_level_purchase,
+                                          )
         self.button_purchase.grid(row=0, column=0, pady=(5, 10), padx=10)
     
         self.button_sell = ttk.Button(frame,
-                                     text='Vender',
-                                     state='disabled',
-                                     width=8,
-                                     takefocus=0,
-                                     command=self.top_level_sell,
-                                     )
+                                      text='Vender',
+                                      state='disabled',
+                                      width=8,
+                                      takefocus=0,
+                                      command=self.top_level_sell,
+                                      )
         self.button_sell.grid(row=0, column=1, pady=(5, 10), padx=10)
     
         self.button_dell = ttk.Button(frame,
-                                     text='Deletar',
-                                     state='disabled',
-                                     style='R.TButton',
-                                     width=8,
-                                     takefocus=0,
-                                     command=self.top_level_delete,
-                                     )
+                                      text='Deletar',
+                                      state='disabled',
+                                      style='R.TButton',
+                                      width=8,
+                                      takefocus=0,
+                                      command=self.top_level_delete,
+                                      )
         self.button_dell.grid(row=0, column=2, pady=(5, 10), padx=10)
 
         self.button_change_data = ttk.Button(frame,
@@ -1329,12 +1319,12 @@ class ListProductsRV(Toplevel):
         self.button_change_data.grid(row=0, column=3, pady=(5, 10), padx=10)
 
         self.button_set_value_amount = ttk.Button(frame,
-                                             text='Acertar valores',
-                                             state='disabled',
-                                             width=12,
-                                             takefocus=0,
-                                             command=self.top_level_amount_value,
-                                             )
+                                                  text='Acertar valores',
+                                                  state='disabled',
+                                                  width=12,
+                                                  takefocus=0,
+                                                  command=self.top_level_amount_value,
+                                                  )
         self.button_set_value_amount.grid(row=0, column=4, pady=(5, 10), padx=10)
     
     # FUNCTIONS
@@ -1373,48 +1363,48 @@ class ListProductsRV(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name.grid(row=1, column=1)
 
             label_code = ttk.Label(frame,
-                                text='Código:',
-                                )
+                                   text='Código:',
+                                   )
             label_code.grid(row=2, column=0)
 
             entry_code = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_code.grid(row=2, column=1)
             entry_code.insert('end', self.item[2])
             
             # LABEL AND ENTRY FOR PURCHASE        
             label_amount = ttk.Label(frame_2,
-                                    text='Quantidade:',
-                                    )
+                                     text='Quantidade:',
+                                     )
             label_amount.grid(row=0, column=0)
             
             self.amount_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                          font='arial 16',
+                                          width=6,
+                                          )
             self.amount_entry.grid(row=0, column=1)
             
             label_value = ttk.Label(frame_2,
@@ -1423,18 +1413,18 @@ class ListProductsRV(Toplevel):
             label_value.grid(row=1, column=0)
             
             self.value_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                         font='arial 16',
+                                         width=6,
+                                         )
             self.value_entry.grid(row=1, column=1)
 
             # BUTTON FOR PURCHASE        
             button_purchase = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.purchase,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.purchase,
+                                         )
             button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_l.destroy()
@@ -1460,48 +1450,48 @@ class ListProductsRV(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name.grid(row=1, column=1)
 
             label_code = ttk.Label(frame,
-                                text='Código:',
-                                )
+                                   text='Código:',
+                                   )
             label_code.grid(row=2, column=0)
 
             entry_code = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_code.grid(row=2, column=1)
             entry_code.insert('end', self.item[2])
             
             # LABEL AND ENTRY FOR SELL    
             label_amount = ttk.Label(frame_2,
-                                    text='Quantidade:',
-                                    )
+                                     text='Quantidade:',
+                                     )
             label_amount.grid(row=0, column=0)
             
             self.amount_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                          font='arial 16',
+                                          width=6,
+                                          )
             self.amount_entry.grid(row=0, column=1)
             
             label_value = ttk.Label(frame_2,
@@ -1510,18 +1500,18 @@ class ListProductsRV(Toplevel):
             label_value.grid(row=1, column=0)
             
             self.value_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=6,
-                                    )
+                                         font='arial 16',
+                                         width=6,
+                                         )
             self.value_entry.grid(row=1, column=1)
 
             # BUTTON FOR SELL      
             button_sell = ttk.Button(frame_2,
-                                    text='Confirmar',
-                                    width=10,
-                                    takefocus=0,
-                                    command=self.sell,
-                                    )
+                                     text='Confirmar',
+                                     width=10,
+                                     takefocus=0,
+                                     command=self.sell,
+                                     )
             button_sell.grid(row=3, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_l.destroy()
@@ -1547,24 +1537,24 @@ class ListProductsRV(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name.grid(row=1, column=1)
             
@@ -1596,30 +1586,30 @@ class ListProductsRV(Toplevel):
         
             # LABEL AND ENTRY FOR DATA
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=0, column=0)
             
             self.entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                        font='arial 16',
+                                        )
             self.entry_name.grid(row=0, column=1)
             self.entry_name.insert('end', self.item[1])
             
             label_code = ttk.Label(frame,
-                                text='Código:',
-                                )
+                                   text='Código:',
+                                   )
             label_code.grid(row=1, column=0)
             
             self.entry_code = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                        font='arial 16',
+                                        )
             self.entry_code.grid(row=1, column=1)
             self.entry_code.insert('end', self.item[2])
 
             label_category = ttk.Label(frame,
-                                    text='Categoria:',
-                                    )
+                                       text='Categoria:',
+                                       )
             label_category.grid(row=2, column=0)
 
             choices: list = ['Ações', 'FIIs']
@@ -1630,11 +1620,11 @@ class ListProductsRV(Toplevel):
 
             # BUTTON FOR CHANGE DATA  
             button_purchase = ttk.Button(frame,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.set_data,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.set_data,
+                                         )
             button_purchase.grid(row=3, column=0, columnspan=2, pady=(15, 0))
         except TypeError:
             self.top_level_sd.destroy()
@@ -1660,50 +1650,50 @@ class ListProductsRV(Toplevel):
             
             # LABEL AND ENTRY FOR DATA
             label_id = ttk.Label(frame,
-                                text='ID:',
-                                )
+                                 text='ID:',
+                                 )
             label_id.grid(row=0, column=0)
             
             entry_id = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                 font='arial 16',
+                                 )
             entry_id.insert('end', self.item[0])
             entry_id['state'] = 'disabled'
             entry_id.grid(row=0, column=1)
             
             label_name = ttk.Label(frame,
-                                text='Nome:',
-                                )
+                                   text='Nome:',
+                                   )
             label_name.grid(row=1, column=0)
             
             entry_name = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_name.insert('end', self.item[1])
             entry_name['state'] = 'disabled'
             entry_name.grid(row=1, column=1)
             
             label_code = ttk.Label(frame,
-                                text='Código:',
-                                )
+                                   text='Código:',
+                                   )
             label_code.grid(row=2, column=0)
             
             entry_code = ttk.Entry(frame,
-                                font='arial 16',
-                                )
+                                   font='arial 16',
+                                   )
             entry_code.insert('end', self.item[2])
             entry_code['state'] = 'disabled'
             entry_code.grid(row=2, column=1)
 
             label_amount = ttk.Label(frame_2,
-                                    text='Quantidade:',
-                                    )
+                                     text='Quantidade:',
+                                     )
             label_amount.grid(row=0, column=0)
             
             self.amount_entry = ttk.Entry(frame_2,
-                                    font='arial 16',
-                                    width=12,
-                                    )
+                                          font='arial 16',
+                                          width=12,
+                                          )
             self.amount_entry.grid(row=0, column=1)
             self.amount_entry.insert('end', self.item[4])
             
@@ -1713,20 +1703,20 @@ class ListProductsRV(Toplevel):
             label_value.grid(row=1, column=0)
             
             self.value_entry = ttk.Entry(frame_2,
-                                        font='arial 16',
-                                        width=12,
-                                        )
+                                         font='arial 16',
+                                         width=12,
+                                         )
             formatted_value: str = str(self.item[5]).replace('R$', '').split()
             self.value_entry.grid(row=1, column=1)
             self.value_entry.insert('end', formatted_value)
             
             # BUTTON FOR CHANGE DATA  
             button_purchase = ttk.Button(frame_2,
-                                        text='Confirmar',
-                                        width=10,
-                                        takefocus=0,
-                                        command=self.change_value_amount,
-                                        )
+                                         text='Confirmar',
+                                         width=10,
+                                         takefocus=0,
+                                         command=self.change_value_amount,
+                                         )
             button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
             self.top_level_set_values.destroy()
