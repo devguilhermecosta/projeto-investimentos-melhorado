@@ -138,8 +138,9 @@ class MetodosSqlRV:
         self._conn.commit()
 
     def acao_sql_acertar_valor_qtde(self, id: str, qtde: int, pu: float) -> None:
-        acao = "UPDATE RV SET quantidade=?, PU=? WHERE id=?"
-        self._cursor.execute(acao, (qtde, pu, id))
+        acao = "UPDATE RV SET quantidade=?, PU=?, PT=? WHERE id=?"
+        valor_total = float(qtde * pu)
+        self._cursor.execute(acao, (qtde, pu, valor_total, id))
         self._conn.commit()
     
     def acao_sql_retorna_tot_invst(self):

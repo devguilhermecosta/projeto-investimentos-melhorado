@@ -16,8 +16,7 @@ class PyInvest:
         self.master = ThemedTk(theme='black')
         self.master.title('PyInvest')
         self.master.configure(background='#000000')
-        self.general_functions = GeneralFunctions()
-        self.general_functions.set_size_window(self.master, 1016, 490)
+        GeneralFunctions.set_size_window(self.master, 1016, 490)
 
         # VARIABLES
         sticky: str = ('n', 'e', 's', 'w')
@@ -99,8 +98,8 @@ class FrameReport(ttk.Frame):
         ttk.Frame.__init__(self, master)
 
         # VARIABLES
-        self.rep_rf = AtivoFactory().rep_rf
-        self.rep_rv = AtivoFactory().rep_rv
+        self.rep_rf = AtivoFactory().conectar_bd_rf()
+        self.rep_rv = AtivoFactory().conectar_bd_rv()
 
         # STYLES
         s = ttk.Style()
@@ -217,8 +216,8 @@ class TopLevelRegister:
         self.top_level = Toplevel(master)
         self.top_level.title('Cadastrar novo ativo')
         self.top_level.configure(background='#000000')
-        general_functions = GeneralFunctions()
-        general_functions.set_size_window(self.top_level, 400, 400)
+        self.top_level.resizable(0, 0)
+        GeneralFunctions.set_size_window(self.top_level, 400, 400)
 
         button_fixed_income = ttk.Button(self.top_level,
                                          text='Renda Fixa',
@@ -259,7 +258,8 @@ class TLRegVariableIncome(Toplevel):
         Toplevel.__init__(self, master)
         self.title(title)
         self.configure(background=color)
-        GeneralFunctions().set_size_window(self, width, height)
+        self.resizable(0, 0)
+        GeneralFunctions.set_size_window(self, width, height)
 
         # VARIABLES
         self.repository = AtivoFactory()
@@ -432,7 +432,8 @@ class TLRegFixedleIncome(Toplevel):
         Toplevel.__init__(self, master)
         self.title(title)
         self.configure(background=color)
-        GeneralFunctions().set_size_window(self, width, height)
+        self.resizable(0, 0)
+        GeneralFunctions.set_size_window(self, width, height)
 
         # STYLES
         s = ttk.Style()
@@ -675,10 +676,11 @@ class ListProductsRF(Toplevel):
         Toplevel.__init__(self, master)
         self.title('Ativos')
         self.configure(background='#000000')
+        self.resizable(0, 0)
         GeneralFunctions.set_size_window(self, 1200, 600)
         
         # VARIABLES
-        self.rep_rf = AtivoFactory().rep_rf
+        self.rep_rf = AtivoFactory().conectar_bd_rf()
 
         # STYLES
         self.s = ttk.Style()
@@ -811,20 +813,21 @@ class ListProductsRF(Toplevel):
             
     def top_level_purchase(self) -> None:
         try:
-            self.top_l = Toplevel(self)
-            self.top_l.title('Comprar ativo')
-            self.top_l.configure(background='#000000')
-            GeneralFunctions.set_size_window(self.top_l, 400, 250)
+            self.top_l_purchase = Toplevel(self)
+            self.top_l_purchase.title('Comprar ativo')
+            self.top_l_purchase.configure(background='#000000')
+            self.top_l_purchase.resizable(0, 0)
+            GeneralFunctions.set_size_window(self.top_l_purchase, 400, 250)
 
             # PRODUCT
             self.item: list = self.item_selected()      
             
             # FRAME
-            frame = ttk.Frame(self.top_l)
+            frame = ttk.Frame(self.top_l_purchase)
             frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
             
             # FRAME_2
-            frame_2 = ttk.Frame(self.top_l)
+            frame_2 = ttk.Frame(self.top_l_purchase)
             frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
             
             # LABEL AND ENTRY FOR DATA
@@ -882,7 +885,7 @@ class ListProductsRF(Toplevel):
                                          )
             button_purchase.grid(row=2, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
-            self.top_l.destroy()
+            self.top_l_purchase.destroy()
             showerror(title='Error', message='Nenhum item selecionado')
     
     def top_level_set_data(self) -> None:
@@ -890,6 +893,7 @@ class ListProductsRF(Toplevel):
             self.top_level_rdm = Toplevel(self)
             self.top_level_rdm.title('Alterar dados cadastrais')
             self.top_level_rdm.configure(background='#000000')
+            self.top_level_rdm.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_rdm, 400, 250)
             
             # PRODUCT
@@ -976,6 +980,7 @@ class ListProductsRF(Toplevel):
             self.top_level_del = Toplevel(self)
             self.top_level_del.title('Deletar ativo')
             self.top_level_del.configure(background='#000000')
+            self.top_level_del.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_del, 400, 200)
             
             # PRODUCT
@@ -1029,6 +1034,7 @@ class ListProductsRF(Toplevel):
             self.top_level_change = Toplevel(self)
             self.top_level_change.title('Acertar valores')
             self.top_level_change.configure(background='#000000')
+            self.top_level_change.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_change, 400, 250)
         
             # PRODUCT
@@ -1117,7 +1123,7 @@ class ListProductsRF(Toplevel):
                 self.rep_rf.comprar(code, int(amount), float(value))
                 showinfo(title='Ok', message=f'Compra realizada com sucesso')
                 self.refresh()
-                self.top_l.destroy()
+                self.top_l_purchase.destroy()
         except ValueError:
             showerror(title='Error', message='Entrada de dados inválida')
         except Exception as error:
@@ -1199,10 +1205,11 @@ class ListProductsRV(Toplevel):
         Toplevel.__init__(self, master)
         self.title('Ativos')
         self.configure(background='#000000')
+        self.resizable(0, 0)
         GeneralFunctions.set_size_window(self, 1200, 600)
 
         # VARIABLES
-        self.rep_rv = AtivoFactory().rep_rv
+        self.rep_rv = AtivoFactory().conectar_bd_rv()
         self.check: bool = False
 
         # STYLES
@@ -1345,20 +1352,21 @@ class ListProductsRV(Toplevel):
 
     def top_level_purchase(self) -> None:
         try:
-            self.top_l = Toplevel(self)
-            self.top_l.title('Comprar ativo')
-            self.top_l.configure(background='#000000')
-            GeneralFunctions.set_size_window(self.top_l, 400, 280)
+            self.top_l_purchase = Toplevel(self)
+            self.top_l_purchase.title('Comprar ativo')
+            self.top_l_purchase.configure(background='#000000')
+            self.top_l_purchase.resizable(0, 0)
+            GeneralFunctions.set_size_window(self.top_l_purchase, 400, 280)
 
             # PRODUCT
             self.item: list = self.item_selected()   
             
             # FRAME
-            frame = ttk.Frame(self.top_l)
+            frame = ttk.Frame(self.top_l_purchase)
             frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
             
             # FRAME_2
-            frame_2 = ttk.Frame(self.top_l)
+            frame_2 = ttk.Frame(self.top_l_purchase)
             frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
             
             # LABEL AND ENTRY FOR DATA
@@ -1427,25 +1435,26 @@ class ListProductsRV(Toplevel):
                                          )
             button_purchase.grid(row=3, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
-            self.top_l.destroy()
+            self.top_l_purchase.destroy()
             showerror(title='Error', message='Nenhum item selecionado')
 
     def top_level_sell(self) -> None:
         try:
-            self.top_l = Toplevel(self)
-            self.top_l.title('Vender ativo')
-            self.top_l.configure(background='#000000')
-            GeneralFunctions.set_size_window(self.top_l, 400, 280)
+            self.top_l_sell = Toplevel(self)
+            self.top_l_sell.title('Vender ativo')
+            self.top_l_sell.configure(background='#000000')
+            self.top_l_sell.resizable(0, 0)
+            GeneralFunctions.set_size_window(self.top_l_sell, 400, 280)
 
             # PRODUCT
             self.item: list = self.item_selected()
             
             # FRAME
-            frame = ttk.Frame(self.top_l)
+            frame = ttk.Frame(self.top_l_sell)
             frame.grid(row=0, column=0, padx=(45, 0), pady=(20, 0))
             
             # FRAME_2
-            frame_2 = ttk.Frame(self.top_l)
+            frame_2 = ttk.Frame(self.top_l_sell)
             frame_2.grid(row=1, column=0, padx=(45, 0), pady=(20, 0))
             
             # LABEL AND ENTRY FOR DATA
@@ -1514,7 +1523,7 @@ class ListProductsRV(Toplevel):
                                      )
             button_sell.grid(row=3, column=0, columnspan=2, pady=(20, 0))
         except TypeError:
-            self.top_l.destroy()
+            self.top_l_sell.destroy()
             showerror(title='Error', message='Nenhum item selecionado')
 
     def top_level_delete(self) -> None:
@@ -1522,6 +1531,7 @@ class ListProductsRV(Toplevel):
             self.top_level_del = Toplevel(self)
             self.top_level_del.title('Deletar ativo')
             self.top_level_del.configure(background='#000000')
+            self.top_level_del.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_del, 400, 200)
             
             # PRODUCT
@@ -1575,6 +1585,7 @@ class ListProductsRV(Toplevel):
             self.top_level_sd = Toplevel(self)
             self.top_level_sd.title('Alterar dados cadastrais')
             self.top_level_sd.configure(background='#000000')
+            self.top_level_sd.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_sd, 400, 200)
             
             # PRODUCT
@@ -1635,6 +1646,7 @@ class ListProductsRV(Toplevel):
             self.top_level_set_values = Toplevel(self)
             self.top_level_set_values.title('Acertar valores')
             self.top_level_set_values.configure(background='#000000')
+            self.top_level_set_values.resizable(0, 0)
             GeneralFunctions.set_size_window(self.top_level_set_values, 400, 270)
         
             # PRODUCT
@@ -1737,7 +1749,7 @@ class ListProductsRV(Toplevel):
                 showinfo(title='Ok',
                         message=f'Compra de {amount} unidade(s) de {label} no total \n'
                                 f'de R$ {self.total_value()} realizada com sucesso.')
-                self.top_l.destroy()
+                self.top_l_purchase.destroy()
                 self.refresh()
         except Exception as error:
             showerror(title='Error', message=error)
@@ -1762,7 +1774,7 @@ class ListProductsRV(Toplevel):
                         message=f'Venda de {amount} unidade(s) de {label} no total \n'
                                 f'de R$ {self.total_value()} realizada com sucesso.')
                 self.refresh()
-                self.top_l.destroy()
+                self.top_l_sell.destroy()
         except Exception as error:
             showerror(title='Error', message=error)
     
