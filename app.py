@@ -136,7 +136,7 @@ class FrameReport(ttk.Frame):
                               )
         label_fii.grid(row=1, column=0, padx=5, pady=5, sticky=sticky)
 
-        text_dt: str = 'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}'
+        text_dt: str = f'Total investido no Tesouro Direto: R$ {self.report_direct_treasure()}'
         label_direct_treasure = ttk.Label(self,
                                           text=text_dt,
                                           style='L.TLabel',
@@ -148,7 +148,7 @@ class FrameReport(ttk.Frame):
                                    sticky=sticky,
                                    )
 
-        text_fi: str = 'Total investido em Renda Fixa: R$ {self.report_fixed_income()}'
+        text_fi: str = f'Total investido em Renda Fixa: R$ {self.report_fixed_income()}'
         label_fixed_income = ttk.Label(self,
                                        text=text_fi,
                                        style='L.TLabel',
