@@ -31,3 +31,5 @@ setup(
     options = {'build_exe': build_exe_options},
     executables = executables,
 )
+
+# command line para compilar -> python setup.py build
